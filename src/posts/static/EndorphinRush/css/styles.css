@@ -1,0 +1,25 @@
+.card-text-posts {
+    background-color: #f6f6f6;
+}
+
+.form-wrapper {
+    margin-bottom: 1rem;
+}
+
+.form-wrapper input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+}
+
+.form-wrapper label{
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.form-wrapper .errorList{
+    display: none;
+}
+
