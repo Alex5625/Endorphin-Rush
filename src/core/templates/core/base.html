@@ -1,14 +1,80 @@
-<html lang="en">
+{% load static %}
+
+<html lang="es-cl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PONER_TITULO</title>
-    <link rel="stylesheet" href="{% static 'blog/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'blog/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
 </head>
 <body>
-    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3" style="backdrop-filter: blur(10px); background-color: rgba(33, 37, 41, 0.95) !important; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div class="container">
+            <a class="navbar-brand fw-black fs-4 d-flex align-items-center tracking-tight" href="{% url 'home' %}" style="letter-spacing: -0.5px;">
+                <span class="p-2 bg-primary rounded-3 d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 38px; height: 38px;">
+                    <i class="bi bi-lightning-charge-fill text-white fs-5"></i>
+                </span>
+                <span class="fw-bold text-white">Endorphin</span><span class="fw-light text-secondary">Rush</span>
+            </a>
+            
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link active px-3 rounded-2 custom-nav-link" aria-current="page" href="{% url 'home' %}">
+                            <i class="bi bi-house-door me-1"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 rounded-2 custom-nav-link" href="#">
+                            <i class="bi bi-bar-chart-line me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 rounded-2 custom-nav-link" href="#">
+                            <i class="bi bi-database me-1"></i> Datos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 rounded-2 custom-nav-link" href="#">
+                            <i class="bi bi-gear me-1"></i> Configuración
+                        </a>
+                    </li>
+                </ul>
 
-    <script src="{% static 'blog/js/bootstrap.bundle.min.js' %}"></script>
+                {% comment %} Inicio de sesión {% endcomment %}
+                <div class="d-flex align-items-center gap-3">
+
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="toast show align-items-center text-white bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+                    <div class="d-flex">
+                        <div class="toast-body d-flex align-items-center gap-2 py-3 px-4">
+                            <i class="bi bi-check-circle-fill fs-4 text-white"></i>
+                            <div>
+                                <strong class="d-block text-white mb-1">¡Operación Exitosa!</strong>
+                                <span style="font-size: 0.9rem; opacity: 0.95;">{{ message }}</span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-3 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <main class="container py-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+    <script src="{% static 'core/js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>
