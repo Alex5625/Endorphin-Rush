@@ -1,25 +1,17 @@
-.card-text-posts {
-    background-color: #f6f6f6;
+/* core/static/core/css/style.css */
+
+.custom-nav-link {
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
 }
 
-.form-wrapper {
-    margin-bottom: 1rem;
+.custom-nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #fff !important;
 }
 
-.form-wrapper input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.25rem;
-}
-
-.form-wrapper label{
+.navbar-nav .nav-link.active {
+    background-color: rgba(13, 110, 253, 0.15) !important;
+    color: #0d6efd !important;
     font-weight: 600;
-    margin-bottom: 0.25rem;
-    display: block;
 }
-
-.form-wrapper .errorList{
-    display: none;
-}
-
