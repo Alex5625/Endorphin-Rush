@@ -28,4 +28,7 @@ urlpatterns = [
          name="login"),
     path("logout/", auth_views.LogoutView.as_view(next_page="home"), name="logout"),
     path('registro/', views.registrar_usuario, name='registro'),
+
+
+    path('', include('core.urls')),
 ]

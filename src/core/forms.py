@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import PerfilUsuario
+from .models import PerfilUsuario, TipoEjercicio
 
 class RegistroCompletoForm(UserCreationForm):
     # Campos por defecto de Django: username, password1, password2
@@ -21,3 +21,20 @@ class RegistroCompletoForm(UserCreationForm):
         model = User
         # Esto define qué campos del modelo User se piden (puedes agregar 'email' si quieres)
         fields = UserCreationForm.Meta.fields
+
+
+
+##formulario para los tipos de ejercicio
+
+class TipoEjercicioForm(forms.ModelForm):
+#formulario para crear y editar categorías de grupos musculares
+    class Meta:
+        model= TipoEjercicio
+        fields = ['nombre_categoria']
+        widgets = {
+            'nombre_categoria': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: Pecho, Espalda, Brazos, Hombros, Abdomen y Piernas',
+                'autocomplete': 'off'
+            })
+        }

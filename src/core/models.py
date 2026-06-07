@@ -20,3 +20,22 @@ class PerfilUsuario(models.Model):
     
     def __str__(self):
         return f"Perfil de {self.usuario.username}"
+    
+
+class TipoEjercicio(models.Model):
+#Modelo para las categorías de grupos musculares 
+#Almacena los contenedores globales del gym (ej: tren superior,
+#tren inferior, pectorales, etc...)
+
+    nombre_categoria = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name="Grupo Muscular"
+    )
+
+    class Meta:
+        verbose_name = "Tipo de Ejercicio"
+        verbose_name_plural = "Tipos de Ejercicios"
+
+    def __str__(self):
+        return self.nombre_categoria

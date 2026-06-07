@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import login
-from .models import PerfilUsuario
-from .forms import RegistroCompletoForm
+from .models import PerfilUsuario, TipoEjercicio
+from .forms import RegistroCompletoForm, TipoEjercicioForm
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.contrib import messages
+
 # Create your views here.
 def home(request):
     return render(request, 'core/home.html')
@@ -71,3 +72,54 @@ def enviar_correo(perfil, correo_destino):
                 recipient_list=[correo_destino], # Lista de destinatarios
                 fail_silently=False, # Si el correo falla, arrojará un error en la app para enterarnos
             )
+
+
+#vistas para el entrenador: gestion de tipos de ejercicio
+#hu-29 permite al entrenador visualizar la lista de categorias musculares 
+#y agregar una nueva en la misma pantalla
+
+def gestion_tipos_ejercicio(request):
+
+    categorias = TipoEjercicio.objects.all().order_by('nombre_categoria')
+    
+    if request.method== 'POST':
+        form = TipoEjercicioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Grupo muscular agregado exitosamente!")
+            return redirect('gestion_tipos_ejercicio')
+        
+    else:
+        form = TipoEjercicioForm()
+
+    context = {
+        'categorias': categorias,
+        'form': form
+    }
+    return render(request, 'core/gestion_tipos.html', context)
+
+#hu-30 permite al entrenador modificar el nombre de un grupo muscular existente
+def editar_tipo_ejercicio(request, pk):
+    
+    categoria = get_object_or_404(TipoEjercicio, pk=pk)
+
+    if request.method == 'POST':
+        form = TipoEjercicioForm(request.POST, instance=categoria)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Grupo muscular actualizado exitosamente!")
+            return redirect('gestion_tipos_ejercicio')
+        
+    else:
+        form= TipoEjercicioForm(instance=categoria)
+
+    return render(request, 'core/editar_tipo.html', {'form': form, 'categoria': categoria})
+
+#HU-31 permite al entrenador eliminar un grupo muscular en forma directa.
+def eliminar_tipo_ejercicio(request, pk):
+    
+    categoria = get_object_or_404(TipoEjercicio, pk=pk)
+    nombre = categoria.nombre_categoria
+    categoria.delete()
+    messages.success(request, f"El grupo muscular '{nombre}' ha sido eliminado exitosamente.")
+    return redirect('gestion_tipos_ejercicio')
