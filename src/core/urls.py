@@ -8,6 +8,9 @@ urlpatterns = [
     # HU-02: Edición de perfil de usuario (solo datos corporales/personales)
     path('editar-perfil/', views.editar_perfil, name='editar_perfil'),
     
+    # HU-03: Eliminación de perfil de usuario (desactivación de cuenta)
+    path('eliminar-perfil/', views.eliminar_perfil, name='eliminar_perfil'),
+    
     # HU-29: Gestión y creación de tipos de ejercicio
     path('gestion-tipos/', views.gestion_tipos_ejercicio, name='gestion_tipos_ejercicio'),
     

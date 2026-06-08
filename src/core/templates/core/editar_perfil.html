@@ -32,21 +32,40 @@
                         {% endfor %}
                         
                         <div class="row g-2 mt-4">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <a href="{% url 'home' %}" class="btn btn-outline-secondary w-100 fw-bold">
                                     Cancelar
                                 </a>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <button type="submit" class="btn btn-success w-100 fw-bold shadow-sm">
                                     <i class="bi bi-floppy-fill me-1"></i> Guardar Cambios
                                 </button>
                             </div>
+                            <div class="col-4">
+                                <button type="button" class="btn btn-danger w-100 fw-bold shadow-sm" onclick="confirmarYEliminar()">
+                                    <i class="bi bi-trash-fill me-1"></i> Eliminar Cuenta
+                                </button>
+                            </div>
                         </div>
+                    </form>
+                    <form id="form-eliminar" action="{% url 'eliminar_perfil' %}" method="POST" style="display: none;">
+                        {% csrf_token %}
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+function confirmarYEliminar() {
+    // 1. Pregunta al usuario
+    const seguro = confirm("¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.");
+    
+    // 2. Si dice que sí, envía el formulario oculto por POST
+    if (seguro) {
+        document.getElementById('form-eliminar').submit();
+    }
+}
+</script>
 {% endblock %}

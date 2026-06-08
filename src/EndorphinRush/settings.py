@@ -102,7 +102,8 @@ AUTH_PASSWORD_VALIDATORS = [
 #Prueba de desarrolo para envio de correos 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@endorphinrush.com'
-
+#Cada vez que un usuario intente acceder a una vista protegida sin estar autenticado, será redirigido a la página de inicio de sesión definida por LOGIN_URL.
+LOGIN_URL = 'login'
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 

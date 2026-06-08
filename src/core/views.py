@@ -1,11 +1,12 @@
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from .models import PerfilUsuario, TipoEjercicio
 from .forms import RegistroCompletoForm, EditarPerfilForm , TipoEjercicioForm
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.contrib import messages
+from django.views.decorators.cache import never_cache
 
 # Create your views here.
 def home(request):
@@ -75,6 +76,7 @@ def enviar_correo(perfil, correo_destino):
             )
 
 @login_required
+@never_cache
 def editar_perfil(request):
     # La funcion get_or_create busca bien en la base de datos, pero si entra por ejemplo el admin sin tener un perfil creado, lo crea automáticamente con datos por defecto para evitar errores en la app. 
     # De esta forma, siempre habrá un perfil asociado al usuario.
@@ -109,6 +111,22 @@ def editar_perfil(request):
         
     return render(request, 'core/editar_perfil.html', {'form': form})
 
+@login_required
+def eliminar_perfil(request):
+    if request.method == 'POST':
+        user = request.user
+        
+        
+        # Desactivación de la cuenta
+        user.is_active = False
+        user.save() 
+        #Cierre de sesión 
+        logout(request) 
+        
+        #Redirección directa al login
+        return redirect('login')
+    
+    return redirect('login')
 
 #vistas para el entrenador: gestion de tipos de ejercicio
 #hu-29 permite al entrenador visualizar la lista de categorias musculares 
