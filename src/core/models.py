@@ -21,7 +21,6 @@ class PerfilUsuario(models.Model):
     def __str__(self):
         return f"Perfil de {self.usuario.username}"
     
-
 class TipoEjercicio(models.Model):
 #Modelo para las categorías de grupos musculares 
 #Almacena los contenedores globales del gym (ej: tren superior,
@@ -39,3 +38,30 @@ class TipoEjercicio(models.Model):
 
     def __str__(self):
         return self.nombre_categoria
+
+class Ejercicio(models.Model):
+    nombre_ejercicio = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name="Nombre del Ejercicio"
+    )
+
+    tipo_ejercicio = models.ForeignKey(
+        'TipoEjercicio',
+        on_delete=models.CASCADE,
+    )
+
+    imagen = models.ImageField(
+        upload_to='ejercicios/',
+        null=True, # vamos a permitir que sea opcional la imagen?
+        blank=True,
+        verbose_name="Imagen del Ejercicio"
+    )
+
+    descripcion_ejercicio = models.TextField(
+        verbose_name="Descripción del Ejercicio",
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.nombre_ejercicio    

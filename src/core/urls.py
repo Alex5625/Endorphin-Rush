@@ -19,5 +19,7 @@ urlpatterns = [
     
     # HU-31: Eliminación de tipo de ejercicio (recibe el ID/pk de la categoría)
     path('gestion-tipos/eliminar/<int:pk>/', views.eliminar_tipo_ejercicio, name='eliminar_tipo_ejercicio'),
-    
+
+    # HU-06: Creación de ejercicios
+    path('lista-ejercicios/', views.gestion_ejercicios, name='lista_ejercicios'),    
 ]

@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from .models import PerfilUsuario, TipoEjercicio
-from .forms import RegistroCompletoForm, EditarPerfilForm , TipoEjercicioForm
+from .models import Ejercicio, PerfilUsuario, TipoEjercicio
+from .forms import RegistroCompletoForm, EditarPerfilForm , TipoEjercicioForm, ejercicioForm
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.contrib import messages
@@ -177,3 +177,23 @@ def eliminar_tipo_ejercicio(request, pk):
     categoria.delete()
     messages.success(request, f"El grupo muscular '{nombre}' ha sido eliminado exitosamente.")
     return redirect('gestion_tipos_ejercicio')
+
+#HU-06 permite al entrenador crear un nuevo ejercicio, asignarlo a una categoría de grupo muscular y subir una imagen ilustrativa del ejercicio.
+def gestion_ejercicios(request):
+    lista_ejercicios = Ejercicio.objects.all()
+
+    if request.method == 'POST':
+        form = ejercicioForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Ejercicio creado exitosamente!")
+            return redirect('lista_ejercicios')
+    else:
+        form = ejercicioForm()
+
+    contexto = {
+        'form': form,
+        'lista_ejercicios': lista_ejercicios
+    }
+
+    return render(request, 'core/lista_ejercicios.html', contexto)

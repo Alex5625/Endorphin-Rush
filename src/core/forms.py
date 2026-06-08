@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import PerfilUsuario, TipoEjercicio
+from .models import Ejercicio, PerfilUsuario, TipoEjercicio
 
 class RegistroCompletoForm(UserCreationForm):
     # Campos por defecto de Django: username, password1, password2
@@ -51,4 +51,27 @@ class TipoEjercicioForm(forms.ModelForm):
                 'placeholder': 'Ej: Pecho, Espalda, Brazos, Hombros, Abdomen y Piernas',
                 'autocomplete': 'off'
             })
+        }
+
+
+class ejercicioForm(forms.ModelForm):
+    class Meta:
+        model = Ejercicio
+        fields = ['nombre_ejercicio', 'tipo_ejercicio', 'imagen', 'descripcion_ejercicio']
+        
+        widgets = {
+            'nombre_ejercicio': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: Press de Banca, Sentadillas, Curl de Bíceps',
+                'autocomplete': 'off',
+                'id': 'form_nombre_ejercicio'
+            }),
+            'tipo_ejercicio': forms.Select(attrs={'class': 'form-select', 'id': 'form_tipo_ejercicio'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'form_imagen_ejercicio'}),
+            'descripcion_ejercicio': forms.Textarea(attrs={
+                'class': 'form-control',
+                'id': 'form_descripcion_ejercicio',
+                'placeholder': 'Describe cómo realizar el ejercicio, los músculos que trabaja, etc.',
+                'rows': 4
+            }),
         }
