@@ -22,7 +22,21 @@ class RegistroCompletoForm(UserCreationForm):
         # Esto define qué campos del modelo User se piden (puedes agregar 'email' si quieres)
         fields = UserCreationForm.Meta.fields
 
-
+class EditarPerfilForm(forms.ModelForm):
+    class Meta:
+        model = PerfilUsuario
+        # Solo permitimos editar estos campos corporales/personales
+        fields = ['nombre', 'apellido', 'edad', 'sexo', 'peso', 'altura']
+        
+        # Reutilizamos los mismos estilos de Bootstrap que el registro
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'apellido': forms.TextInput(attrs={'class': 'form-control'}),
+            'edad': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'sexo': forms.Select(attrs={'class': 'form-select'}),
+            'peso': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1'}),
+            'altura': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+        }
 
 ##formulario para los tipos de ejercicio
 

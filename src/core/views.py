@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from .models import PerfilUsuario, TipoEjercicio
-from .forms import RegistroCompletoForm, TipoEjercicioForm
+from .forms import RegistroCompletoForm, EditarPerfilForm , TipoEjercicioForm
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.contrib import messages
@@ -72,6 +73,41 @@ def enviar_correo(perfil, correo_destino):
                 recipient_list=[correo_destino], # Lista de destinatarios
                 fail_silently=False, # Si el correo falla, arrojará un error en la app para enterarnos
             )
+
+@login_required
+def editar_perfil(request):
+    # La funcion get_or_create busca bien en la base de datos, pero si entra por ejemplo el admin sin tener un perfil creado, lo crea automáticamente con datos por defecto para evitar errores en la app. 
+    # De esta forma, siempre habrá un perfil asociado al usuario.
+    perfil, created = PerfilUsuario.objects.get_or_create(
+            usuario=request.user,
+            defaults={
+                'nombre': request.user.first_name or "Usuario",
+                'apellido': request.user.last_name or "Administrador",
+                'edad': 25,
+                'sexo': 'O',
+                'peso': 70.0,
+                'altura': 1.70
+            }
+        )
+    # 1. Obtenemos el perfil del usuario que tiene la sesión activa
+    #perfil = request.user.perfil 
+    
+    if request.method == 'POST':
+        # 2. Le pasamos los datos del POST pero vinculados a la instancia actual
+        form = EditarPerfilForm(request.POST, instance=perfil)
+        if form.is_valid():
+            # 3. Guarda los cambios directamente sobre el mismo registro en la BD
+            form.save() 
+            
+            # 4. Encolamos el mensaje flotante de éxito
+            messages.success(request, "¡Tus datos corporales se han actualizado correctamente!")
+            
+            return redirect('home')
+    else:
+        # Petición GET: Carga el formulario relleno con los datos viejos de la BD
+        form = EditarPerfilForm(instance=perfil)
+        
+    return render(request, 'core/editar_perfil.html', {'form': form})
 
 
 #vistas para el entrenador: gestion de tipos de ejercicio
