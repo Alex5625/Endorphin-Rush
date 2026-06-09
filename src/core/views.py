@@ -197,3 +197,23 @@ def gestion_ejercicios(request):
     }
 
     return render(request, 'core/lista_ejercicios.html', contexto)
+
+# HU-07 permite al entrenador editar un ejercicio existente
+def editar_ejercicio(request, pk):
+    
+    ejercicio = get_object_or_404(Ejercicio, pk=pk)
+
+    if request.method == 'POST':
+        form = ejercicioForm(request.POST, request.FILES, instance=ejercicio)
+        if form.is_valid():
+
+            ejercicio_modificado = form.save(commit=False)
+            ejercicio_modificado.aprobado = False 
+            ejercicio_modificado.save()
+            messages.success(request, "Ejercicio actualizado exitosamente!")
+            return redirect('lista_ejercicios')
+        
+    else:
+        form= ejercicioForm(instance=ejercicio)
+
+    return render(request, 'core/editar_ejercicio.html', {'form': form, 'ejercicio': ejercicio})

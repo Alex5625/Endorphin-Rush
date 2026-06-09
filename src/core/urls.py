@@ -22,4 +22,6 @@ urlpatterns = [
 
     # HU-06: Creación de ejercicios
     path('lista-ejercicios/', views.gestion_ejercicios, name='lista_ejercicios'),    
+
+    path('lista-ejercicios/editar/<int:pk>/', views.editar_ejercicio, name='editar_ejercicio'),
 ]

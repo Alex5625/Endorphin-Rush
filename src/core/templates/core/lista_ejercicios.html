@@ -22,13 +22,21 @@
                             <span>Sin imagen</span>
                         </div>
                     {% endif %}
-                    
                     <div class="card-body">
-                        <h5 class="card-title text-light">{{ ejercicio.nombre }}</h5>
+                        <h5 class="card-title text-light">{{ ejercicio.nombre_ejercicio }}</h5>
                         <h6 class="card-subtitle mb-2 text-light">{{ ejercicio.tipo_ejercicio.nombre_categoria }}</h6>
-                        <p class="card-text text-truncate">{{ ejercicio.descripcion }}</p>
+                        {% if ejercicio.aprobado %}
+                            <span class="badge bg-success">Aprobado</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Pendiente de aprobación</span>
+                        {% endif %}
+                        <p class="card-text text-truncate">{{ ejercicio.descripcion_ejercicio }}</p>
+                        <a href="{% url 'editar_ejercicio' ejercicio.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
                     </div>
                 </div>
+
             </div>
         {% empty %}
             <div class="col-12 text-center text-black mt-5">

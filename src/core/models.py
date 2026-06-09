@@ -63,5 +63,10 @@ class Ejercicio(models.Model):
         blank=True,
     )
 
+    autorizado = models.BooleanField(
+        default=False,
+        verbose_name="¿Autorizado para mostrar en la app?"
+    )
+
     def __str__(self):
         return self.nombre_ejercicio    
