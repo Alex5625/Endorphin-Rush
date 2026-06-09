@@ -1,12 +1,78 @@
-<form method="POST">
-    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-</form>
+{% extends "core/base.html" %}
 
-<hr>
+{% block title %}Login{% endblock %}
 
-<div class="text-center mt-3">
-    <p>¿No tienes una cuenta aún?</p>
-    <a href="{% url 'registro' %}" class="btn btn-outline-secondary">
-        <i class="bi bi-person-plus-fill me-1"></i> Regístrate aquí
-    </a>
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="row w-100 justify-content-center">
+        <div class="col-12 col-md-6 col-lg-4">
+            
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body p-4">
+                    
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-dark mb-1">Iniciar Sesión</h2>
+                        <p class="text-secondary small">Ingresa tus credenciales para acceder</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show small" role="alert">
+                                {% if message.tags == 'success' %}
+                                    <i class="bi bi-check-circle-fill me-2"></i>
+                                {% else %}
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                {% endif %}
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger small" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <i class="bi bi-exclamation-circle-fill me-2"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-secondary small">{{ field.label }}</label>
+                                {{ field }}
+                                
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-1" style="font-size: 0.85rem;">
+                                        {% for error in field.errors %}
+                                            <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        
+                        <button type="submit" class="btn btn-success w-100 fw-bold mt-3 shadow-sm">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Ingresar
+                        </button>
+                    </form>
+
+                    <hr class="text-muted my-4">
+
+                    <div class="text-center mt-3">
+                        <p class="mb-2 text-secondary">¿No tienes una cuenta aún?</p>
+                        <a href="{% url 'registro' %}" class="btn btn-outline-secondary w-100 fw-bold">
+                            <i class="bi bi-person-plus-fill me-1"></i> Regístrate aquí
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
+{% endblock %}
