@@ -34,6 +34,12 @@
                         <a href="{% url 'editar_ejercicio' ejercicio.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
                             <i class="bi bi-pencil-square"></i>
                         </a>
+                        <a href="{% url 'eliminar_ejercicio' ejercicio.pk %}" 
+                            class="btn btn-sm btn-outline-danger rounded-2" 
+                            title="Eliminar"
+                            onclick="return confirm('¿Estás segura de que deseas eliminar el ejercicio «{{ ejercicio.nombre_ejercicio }}»?');">
+                            <i class="bi bi-trash"></i>
+                        </a>
                     </div>
                 </div>
 

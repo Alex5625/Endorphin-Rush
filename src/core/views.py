@@ -217,3 +217,11 @@ def editar_ejercicio(request, pk):
         form= ejercicioForm(instance=ejercicio)
 
     return render(request, 'core/editar_ejercicio.html', {'form': form, 'ejercicio': ejercicio})
+
+def eliminar_ejercicio(request, pk):
+    
+    ejercicio = get_object_or_404(Ejercicio, pk=pk)
+    nombre = ejercicio.nombre_ejercicio
+    ejercicio.delete()
+    messages.success(request, f"El ejercicio '{nombre}' ha sido eliminado exitosamente.")
+    return redirect('lista_ejercicios')
