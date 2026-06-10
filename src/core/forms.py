@@ -52,6 +52,24 @@ class TipoEjercicioForm(forms.ModelForm):
                 'autocomplete': 'off'
             })
         }
+    # MÉTODO DE LIMPIEZA Y VALIDACION LOGICA
+    def clean_nombre_categoria(self):
+        # 1. Recuperamos el texto, eliminamos espacios extras y lo pasamos a minúsculas estrictas
+        nombre = self.cleaned_data.get('nombre_categoria')
+        if nombre:
+            nombre = nombre.strip().lower()
+        
+        # 2. Comprobamos si ya existe en la base de datos para evitar duplicados lógicos
+        # Usamos .exclude(pk=self.instance.pk) para que si estamos EDITANDO permita guardar el mismo
+        existe = TipoEjercicio.objects.filter(nombre_categoria=nombre).exclude(pk=self.instance.pk).exists()
+        
+        if existe:
+            raise forms.ValidationError(
+                "Esta categoría de grupo muscular ya existe en la base de datos."
+            )
+            
+        # 3. Retornamos el valor en minúsculas listo para ser guardado
+        return nombre
 
 
 class ejercicioForm(forms.ModelForm):
@@ -75,3 +93,20 @@ class ejercicioForm(forms.ModelForm):
                 'rows': 4
             }),
         }
+    # MÉTODO DE LIMPIEZA Y VALIDACION LOGICA
+    def clean_nombre_ejercicio(self):
+        # 1. Recuperamos el texto, eliminamos espacios extras y lo pasamos a minúsculas estrictas
+        nombre = self.cleaned_data.get('nombre_ejercicio')
+        if nombre:
+            nombre = nombre.strip().lower()
+        
+        # 2. Comprobamos si ya existe en la base de datos para evitar duplicados lógicos
+        existe = Ejercicio.objects.filter(nombre_ejercicio=nombre).exclude(pk=self.instance.pk).exists()
+        
+        if existe:
+            raise forms.ValidationError(
+                "Este ejercicio ya existe en la base de datos."
+            )
+            
+        # 3. Retornamos el valor en minusculas listo para ser guardado
+        return nombre

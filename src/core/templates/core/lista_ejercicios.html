@@ -16,15 +16,15 @@
             <div class="col-md-4 mb-4">
                 <div class="card bg-dark text-light border-secondary h-100">
                     {% if ejercicio.imagen %}
-                        <img src="{{ ejercicio.imagen.url }}" class="card-img-top" alt="{{ ejercicio.nombre }}" style="height: 200px; object-fit: cover;">
+                        <img src="{{ ejercicio.imagen.url }}" class="card-img-top" alt="{{ ejercicio.nombre_ejercicio|capfirst }}" style="height: 200px; object-fit: cover;">
                     {% else %}
                         <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
                             <span>Sin imagen</span>
                         </div>
                     {% endif %}
                     <div class="card-body">
-                        <h5 class="card-title text-light">{{ ejercicio.nombre_ejercicio }}</h5>
-                        <h6 class="card-subtitle mb-2 text-light">{{ ejercicio.tipo_ejercicio.nombre_categoria }}</h6>
+                        <h5 class="card-title text-light">{{ ejercicio.nombre_ejercicio|capfirst }}</h5>
+                        <h6 class="card-subtitle mb-2 text-light">{{ ejercicio.tipo_ejercicio.nombre_categoria|capfirst }}</h6>
                         {% if ejercicio.aprobado %}
                             <span class="badge bg-success">Aprobado</span>
                         {% else %}
