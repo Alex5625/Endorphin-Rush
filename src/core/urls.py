@@ -11,6 +11,10 @@ urlpatterns = [
     # HU-03: Eliminación de perfil de usuario (desactivación de cuenta)
     path('eliminar-perfil/', views.eliminar_perfil, name='eliminar_perfil'),
     
+    #HU-09: Historial de Acciones y auditoria
+    path('panel-auditoria/', views.panel_auditoria, name='panel_auditoria'),
+    path('ejercicio/<int:pk>/<str:accion>/', views.autorizar_ejercicio, name='autorizar_ejercicio'),
+
     # HU-29: Gestión y creación de tipos de ejercicio
     path('gestion-tipos/', views.gestion_tipos_ejercicio, name='gestion_tipos_ejercicio'),
     

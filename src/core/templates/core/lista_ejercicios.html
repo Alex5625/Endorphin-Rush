@@ -25,12 +25,15 @@
                     <div class="card-body">
                         <h5 class="card-title text-light">{{ ejercicio.nombre_ejercicio|capfirst }}</h5>
                         <h6 class="card-subtitle mb-2 text-light">{{ ejercicio.tipo_ejercicio.nombre_categoria|capfirst }}</h6>
-                        {% if ejercicio.aprobado %}
+                        
+                        {% if ejercicio.autorizado %}
                             <span class="badge bg-success">Aprobado</span>
                         {% else %}
                             <span class="badge bg-warning text-dark">Pendiente de aprobación</span>
                         {% endif %}
+
                         <p class="card-text text-truncate">{{ ejercicio.descripcion_ejercicio }}</p>
+                        
                         <a href="{% url 'editar_ejercicio' ejercicio.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
                             <i class="bi bi-pencil-square"></i>
                         </a>
@@ -40,6 +43,19 @@
                             onclick="return confirm('¿Estás segura de que deseas eliminar el ejercicio «{{ ejercicio.nombre_ejercicio }}»?');">
                             <i class="bi bi-trash"></i>
                         </a>
+
+                        {% if user.is_staff and not ejercicio.autorizado %}
+                            <small class="text-warning d-block mb-1">Acciones de Admin:</small>
+                            <div class="btn-group btn-group-sm mt-1" role="group">
+                                <a href="{% url 'autorizar_ejercicio' ejercicio.pk 'aprobar' %}" class="btn btn-success rounded-start-2">
+                                    Aprobar
+                                </a>
+                                <a href="{% url 'autorizar_ejercicio' ejercicio.pk 'rechazar' %}" class="btn btn-danger rounded-end-2"
+                                    onclick="return confirm('¿Estás segura de rechazar y eliminar permanentemente este ejercicio?');">
+                                    Rechazar
+                                </a>
+                            </div>
+                    {% endif %}
                     </div>
                 </div>
 

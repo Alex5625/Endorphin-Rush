@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
-from .models import Ejercicio, PerfilUsuario, TipoEjercicio
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import Ejercicio, PerfilUsuario, TipoEjercicio, HistorialAcciones
 from .forms import RegistroCompletoForm, EditarPerfilForm , TipoEjercicioForm, ejercicioForm
 from django.shortcuts import redirect
 from django.core.mail import send_mail
@@ -31,6 +31,13 @@ def registrar_usuario(request):
             )
             correo_destino = form.cleaned_data['username']
             enviar_correo(perfil, correo_destino)
+
+            #para el historial
+            HistorialAcciones.objects.create(
+                usuario=usuario_nuevo,
+                accion="Creación de cuenta",
+                detalle=f"El usuario {usuario_nuevo.username} ({perfil.nombre} {perfil.apellido}) se ha registrado en el sistema."
+            )
             
             #Entregar el mensaje flotante
             messages.success(
@@ -99,7 +106,14 @@ def editar_perfil(request):
         form = EditarPerfilForm(request.POST, instance=perfil)
         if form.is_valid():
             # 3. Guarda los cambios directamente sobre el mismo registro en la BD
-            form.save() 
+            perfil_editado = form.save() 
+
+            #para el historial
+            HistorialAcciones.objects.create(
+                usuario=request.user,
+                accion="Modificación de perfil",
+                detalle=f"El usuario actualizó sus datos de perfil o contacto (Correo: {request.user.email})."
+            )
             
             # 4. Encolamos el mensaje flotante de éxito
             messages.success(request, "¡Tus datos corporales se han actualizado correctamente!")
@@ -185,7 +199,15 @@ def gestion_ejercicios(request):
     if request.method == 'POST':
         form = ejercicioForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            nuevo_ejercicio = form.save()
+
+            #para guardar en el historial
+            HistorialAcciones.objects.create(
+                usuario=request.user,
+                accion="Creación de Ejercicio (Pendiente)",
+                detalle=f"El entrenador {request.user.username} creó el ejercicio '{nuevo_ejercicio.nombre_ejercicio}' (Falta aprobación)."
+            )
+
             messages.success(request, "Ejercicio creado exitosamente!")
             return redirect('lista_ejercicios')
     else:
@@ -199,6 +221,7 @@ def gestion_ejercicios(request):
     return render(request, 'core/lista_ejercicios.html', contexto)
 
 # HU-07 permite al entrenador editar un ejercicio existente
+
 def editar_ejercicio(request, pk):
     
     ejercicio = get_object_or_404(Ejercicio, pk=pk)
@@ -208,9 +231,18 @@ def editar_ejercicio(request, pk):
         if form.is_valid():
 
             ejercicio_modificado = form.save(commit=False)
-            ejercicio_modificado.aprobado = False 
+            #asi al ser editado por un entrenador, vuelve a requerir revision del admin
+            ejercicio_modificado.autorizado = False 
             ejercicio_modificado.save()
-            messages.success(request, "Ejercicio actualizado exitosamente!")
+
+            #se guarda la edición en el historial
+            HistorialAcciones.objects.create(
+                usuario=request.user,
+                accion="Modificación de Ejercicio (Pendiente)",
+                detalle=f"El entrenador {request.user.username} editó '{ejercicio_modificado.nombre_ejercicio}'. Volvió a estado Pendiente de revisión."
+            )
+
+            messages.success(request, "Ejercicio actualizado exitosamente y enviado a revisión!")
             return redirect('lista_ejercicios')
         
     else:
@@ -222,6 +254,57 @@ def eliminar_ejercicio(request, pk):
     
     ejercicio = get_object_or_404(Ejercicio, pk=pk)
     nombre = ejercicio.nombre_ejercicio
+
+    #se deja registro en el historial antes de borrarlo
+    HistorialAcciones.objects.create(
+        usuario=request.user,
+        accion="Ejercicio Eliminado",
+        detalle=f"Se eliminó el ejercicio '{nombre}' del sistema."
+    )
+
     ejercicio.delete()
     messages.success(request, f"El ejercicio '{nombre}' ha sido eliminado exitosamente.")
     return redirect('lista_ejercicios')
+
+##vistas exclusivas del admin
+@login_required
+@user_passes_test(lambda u: u.is_staff, login_url='home')
+def autorizar_ejercicio(request, pk, accion):
+##Vista para que el admin apruebe o rechace un ejercicio.
+###accion q puede ser aprobar o rechazar.
+
+    ejercicio = get_object_or_404(Ejercicio, pk=pk)
+    
+    if accion == 'aprobar':
+        ejercicio.autorizado = True
+        ejercicio.save()
+        
+        HistorialAcciones.objects.create(
+            usuario=request.user,
+            accion="Ejercicio Aprobado",
+            detalle=f"El administrador aprobó el ejercicio '{ejercicio.nombre_ejercicio}'."
+        )
+        messages.success(request, f"El ejercicio '{ejercicio.nombre_ejercicio}' ha sido aprobado.")
+        
+    elif accion == 'rechazar':
+        nombre_ejercicio = ejercicio.nombre_ejercicio
+        ejercicio.delete() #si se rechaza, se elimina para que el entrenador lo suba bien
+        
+        HistorialAcciones.objects.create(
+            usuario=request.user,
+            accion="Ejercicio Rechazado",
+            detalle=f"El administrador rechazó y eliminó el ejercicio '{nombre_ejercicio}'."
+        )
+        messages.warning(request, f"El ejercicio '{nombre_ejercicio}' ha sido rechazado y removido.")
+        
+    return redirect('lista_ejercicios')
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff, login_url='home')
+
+def panel_auditoria(request):
+###Vista del panel exclusivo para que el admin vea todo el historial de movimientos
+
+    logs = HistorialAcciones.objects.all() #viene ordenado por fecha desde el modelo
+    return render(request, 'core/panel_auditoria.html', {'logs': logs})

@@ -1,0 +1,70 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark fw-bold mb-1">Panel de Auditoría</h2>
+            <p class="text-muted mb-0">Historial exclusivo de movimientos y cuentas del sistema del Gym Studio:Rush </p>
+        </div>
+        <span class="badge bg-primary px-3 py-2 fs-6">Modo Administrador</span>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-secondary fw-semibold">
+                        <tr>
+                            <th scope="col" class="ps-4 py-3" style="width: 18%;">Fecha y Hora</th>
+                            <th scope="col" class="py-3" style="width: 15%;">Usuario</th>
+                            <th scope="col" class="py-3" style="width: 25%;">Acción</th>
+                            <th scope="col" class="pe-4 py-3" style="width: 42%;">Detalle de los Movimientos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td class="ps-4 text-secondary small fw-medium">
+                                {{ log.fecha|date:"d/m/Y H:i" }}
+                            </td>
+                            <td>
+                                {% if log.usuario %}
+                                    <span class="badge bg-light text-dark border px-2 py-1">
+                                        👤 {{ log.usuario.username }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">
+                                        Sistema/Anónimo
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if "Aprobado" in log.accion %}
+                                    <span class="text-success fw-bold">✓ {{ log.accion }}</span>
+                                {% elif "Rechazado" in log.accion or "Eliminado" in log.accion %}
+                                    <span class="text-danger fw-bold">✗ {{ log.accion }}</span>
+                                {% elif "Creación" in log.accion %}
+                                    <span class="text-primary fw-bold">+ {{ log.accion }}</span>
+                                {% else %}
+                                    <span class="text-info fw-bold">⚙ {{ log.accion }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="pe-4 text-muted small">
+                                {{ log.detalle }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                No se han registrado movimientos ni acciones en el sistema todavía.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
