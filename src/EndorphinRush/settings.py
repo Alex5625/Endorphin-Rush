@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'authentication',
+    'exercise_types',
+    'exercises',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +58,7 @@ ROOT_URLCONF = 'EndorphinRush.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -103,7 +106,9 @@ AUTH_PASSWORD_VALIDATORS = [
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@endorphinrush.com'
 #Cada vez que un usuario intente acceder a una vista protegida sin estar autenticado, será redirigido a la página de inicio de sesión definida por LOGIN_URL.
-LOGIN_URL = 'login'
+LOGIN_URL = 'authentication:login'
+LOGIN_REDIRECT_URL = 'core:home' # Después de iniciar sesión, redirige al home
+LOGOUT_REDIRECT_URL = 'authentication:login' # Después de cerrar sesión, redirige al login
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
@@ -120,3 +125,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'

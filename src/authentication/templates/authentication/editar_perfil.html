@@ -1,4 +1,4 @@
-{% extends 'core/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <div class="container mt-5 mb-5">
@@ -33,7 +33,7 @@
                         
                         <div class="row g-2 mt-4">
                             <div class="col-4">
-                                <a href="{% url 'home' %}" class="btn btn-outline-secondary w-100 fw-bold">
+                                <a href="{% url 'core:home' %}" class="btn btn-outline-secondary w-100 fw-bold">
                                     Cancelar
                                 </a>
                             </div>
@@ -49,7 +49,7 @@
                             </div>
                         </div>
                     </form>
-                    <form id="form-eliminar" action="{% url 'eliminar_perfil' %}" method="POST" style="display: none;">
+                    <form id="form-eliminar" action="{% url 'authentication:eliminar_perfil' %}" method="POST" style="display: none;">
                         {% csrf_token %}
                     </form>
                 </div>

@@ -18,16 +18,18 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from core import views
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("login/", 
-         auth_views.LoginView.as_view(template_name="registration/login.html",         
-                                      redirect_authenticated_user=True,
-                                      next_page="home",), 
-         name="login"),
-    path("logout/", auth_views.LogoutView.as_view(next_page="home"), name="logout"),
-    path('registro/', views.registrar_usuario, name='registro'),
+
 
 
     path('', include('core.urls')),
+    path('authentication/', include('authentication.urls')),
+    path('exercise_types/', include('exercise_types.urls')),
+    path('exercises/', include('exercises.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
