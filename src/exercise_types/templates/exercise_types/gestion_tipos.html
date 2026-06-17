@@ -1,4 +1,4 @@
-{% extends 'core/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <div class="container mt-5">
@@ -63,10 +63,10 @@
                                         </span>
                                     </td>
                                     <td class="text-end pe-4">
-                                        <a href="{% url 'editar_tipo_ejercicio' cat.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
+                                        <a href="{% url 'exercise_types:editar_tipo_ejercicio' cat.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <a href="{% url 'eliminar_tipo_ejercicio' cat.pk %}" 
+                                        <a href="{% url 'exercise_types:eliminar_tipo_ejercicio' cat.pk %}" 
                                            class="btn btn-sm btn-outline-danger rounded-2" 
                                            title="Eliminar"
                                            onclick="return confirm('¿Estás segura de que deseas eliminar la categoría «{{ cat.nombre_categoria }}»? Los entrenadores ya no podrán asignarla.');">

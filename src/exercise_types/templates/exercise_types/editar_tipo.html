@@ -1,11 +1,11 @@
-{% extends 'core/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-12 col-md-6">
             
-            <a href="{% url 'gestion_tipos_ejercicio' %}" class="btn btn-sm btn-outline-secondary mb-3 rounded-2">
+            <a href="{% url 'exercise_types:gestion_tipos_ejercicio' %}" class="btn btn-sm btn-outline-secondary mb-3 rounded-2">
                 <i class="bi bi-arrow-left"></i> Volver al panel
             </a>
 
@@ -39,7 +39,7 @@
                             <button type="submit" class="btn btn-warning w-100 py-2 rounded-2 fw-medium shadow-sm">
                                 <i class="bi bi-check-circle"></i> Actualizar Cambios
                             </button>
-                            <a href="{% url 'gestion_tipos_ejercicio' %}" class="btn btn-light border w-100 py-2 rounded-2 fw-medium">
+                            <a href="{% url 'exercise_types:gestion_tipos_ejercicio' %}" class="btn btn-light border w-100 py-2 rounded-2 fw-medium">
                                 Cancelar
                             </a>
                         </div>
