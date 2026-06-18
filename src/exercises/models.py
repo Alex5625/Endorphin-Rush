@@ -6,12 +6,13 @@ class Ejercicio(models.Model):
     nombre_ejercicio = models.CharField(
         max_length=100,
         unique=True,
-        verbose_name="Nombre del Ejercicio"
+        verbose_name="Nombre del Ejercicio*"
     )
 
     # Relación cruzada apuntando a la app exercise_types de forma segura:
     tipo_ejercicio = models.ForeignKey(
         'exercise_types.TipoEjercicio',
+        verbose_name="Tipo de Ejercicio*",
         on_delete=models.CASCADE,
     )
 

@@ -79,8 +79,10 @@
             <form method="POST" action="" enctype="multipart/form-data">
                 <div class="modal-body">
                     {% csrf_token %}
-                    {{ form.as_p }} </div>
+                    {{ form.as_p }} 
+                </div>
                 <div class="modal-footer border-secondary">
+                    <h6 class="text-start text-danger">* Campos obligatorios</h6>
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-success">Guardar Ejercicio</button>
                 </div>
