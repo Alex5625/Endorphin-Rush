@@ -85,76 +85,14 @@ def eliminar_ejercicio(request, pk):
     messages.success(request, f"El ejercicio '{nombre}' ha sido eliminado exitosamente.")
     return redirect('exercises:lista_ejercicios')
 
-##para la autorizacion de ejercicios
-
-#filtro de seguridad: para q solo entren los administradores 
-def es_administrador(user):
-    return user.is_staff or user.is_superuser
-
-# 1- Vista para listar los ejercicios que esperan aprobación
-@login_required
-@user_passes_test(es_administrador)
-def panel_pendientes(request):
-    ejercicios_pendientes = Ejercicio.objects.filter(autorizado=False)
-    return render(request, 'exercises/panel_pendientes.html', {'ejercicios': ejercicios_pendientes})
-
-# 2- Vista que procesa el botón de Aprobar o Rechazar
-@login_required
-@user_passes_test(es_administrador)
-def procesar_ejercicio(request, pk):
-    ejercicio = get_object_or_404(Ejercicio, pk=pk)
+## para la hu-11 de visualización del catalago de ejercicios
+def catalogo_ejercicios(request):
+    #se filtra para traer únicamente los ejercicios que ya fueron autorizados
+    ejercicios = Ejercicio.objects.filter(autorizado=True)
     
-    #obtenemos el correo del autor si existe, sino usamos uno de respaldo
-    email_entrenador = ejercicio.autor.email if ejercicio.autor and ejercicio.autor.email else "entrenador_anonimo@correo.com"
-
-    if request.method == 'POST':
-        accion = request.POST.get('accion')
-        
-        if accion == 'aprobar':
-            ejercicio.autorizado = True
-            ejercicio.save()
-            
-            #se registra en el Historial
-            HistorialAcciones.objects.create(
-                usuario=request.user,
-                accion="Aprobación de Ejercicio",
-                detalle=f"Se ha autorizado el ejercicio '{ejercicio.nombre_ejercicio}' para el catálogo público."
-            )
-            
-            #se envia el Correo de aprobación
-            send_mail(
-                subject='¡Tu ejercicio ha sido aprobado! - Equipo Endorphin Rush',
-                message=f"Hola,\n\nTe informamos que tu propuesta de ejercicio '{ejercicio.nombre_ejercicio}' ha sido aprobada por el administrador y ya está disponible en el catálogo público.\n\n¡Gracias por tu colaboración!",
-                from_email=None,
-                recipient_list=[email_entrenador],
-                fail_silently=False,
-            )
-            
-            messages.success(request, f"El ejercicio '{ejercicio.nombre_ejercicio}' ha sido aprobado con éxito.")
-            
-        elif accion == 'rechazar':
-            motivo = request.POST.get('motivo_rechazo', 'No cumple con los estándares requeridos.')
-            nombre_respaldo = ejercicio.nombre_ejercicio
-            
-            #se registra antes de borrarlo
-            HistorialAcciones.objects.create(
-                usuario=request.user,
-                accion="Rechazo de Ejercicio",
-                detalle=f"Se rechazó y eliminó el ejercicio '{nombre_respaldo}'. Motivo: {motivo}"
-            )
-            
-            #enviar Correo de Rechazo con la retroalimentación dando el motivo de rechazo
-            send_mail(
-                subject='Actualización sobre tu propuesta de ejercicio - Endorphin Rush',
-                message=f"Hola,\n\nLamentamos informarte que tu propuesta de ejercicio '{nombre_respaldo}' no fue aprobada.\n\nRetroalimentación del Administrador:\n\"{motivo}\"\n\nTe invitamos a revisar estas correcciones y volver a postular tu ejercicio en el futuro.\n\nSaludos cordiales,\nEquipo de Administración.",
-                from_email=None,
-                recipient_list=[email_entrenador],
-                fail_silently=False,
-            )
-            
-            #se elimina al ser rechazado 
-            ejercicio.delete()
-            
-            messages.warning(request, f"El ejercicio '{nombre_respaldo}' ha sido rechazado y eliminado del sistema.")
-            
-    return redirect('exercises:panel_pendientes')
+    context = {
+        'ejercicios': ejercicios
+    }
+    
+    #render a la plantilla HTML pasandole los ejercicios
+    return render(request, 'exercises/catalogo.html', context)

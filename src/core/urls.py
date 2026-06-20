@@ -16,7 +16,13 @@ urlpatterns = [
     
     #HU-09: Historial de Acciones y auditoria
     path('panel-auditoria/', views.panel_auditoria, name='panel_auditoria'),
+
+    #HU-10: Autorización de Ejercicios
     path('ejercicio/<int:pk>/<str:accion>/', views.autorizar_ejercicio, name='autorizar_ejercicio'),
+
+    path('panel-control/pendientes/', views.panel_pendientes, name='panel_pendientes'),
+    path('panel-control/procesar/<int:pk>/', views.procesar_ejercicio, name='procesar_ejercicio'),
+
 
 #     # HU-29: Gestión y creación de tipos de ejercicio
 #     path('gestion-tipos/', views.gestion_tipos_ejercicio, name='gestion_tipos_ejercicio'),

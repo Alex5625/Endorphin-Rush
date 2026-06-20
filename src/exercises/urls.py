@@ -14,7 +14,6 @@ urlpatterns = [
     # HU-08: Eliminación de ejercicios (recibe el ID/pk del ejercicio)
     path('lista-ejercicios/eliminar/<int:pk>/', views.eliminar_ejercicio, name='eliminar_ejercicio'),
 
-    path('panel-control/pendientes/', views.panel_pendientes, name='panel_pendientes'),
-    path('panel-control/procesar/<int:pk>/', views.procesar_ejercicio, name='procesar_ejercicio'),
+    # HU-11: Visualización de Ejercicios
+    path('catalogo/', views.catalogo_ejercicios, name='catalogo_ejercicios'),
 ]
-

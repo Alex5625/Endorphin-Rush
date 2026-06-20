@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Catálogo de Ejercicios</h1>
+        <p class="lead text-muted">Explora nuestra biblioteca de movimientos autorizados.</p>
+    </div>
+
+    {% if ejercicios %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for ejercicio in ejercicios %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        {% if ejercicio.imagen %}
+                            <img src="{{ ejercicio.imagen.url }}" class="card-img-top" alt="{{ ejercicio.nombre_ejercicio }}" style="height: 220px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light text-center d-flex align-items-center justify-content-center" style="height: 220px;">
+                                <span class="text-muted"><i class="bi bi-image" style="font-size: 2rem;"></i><br>Sin imagen</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge bg-secondary mb-2 align-self-start">{{ ejercicio.tipo_ejercicio.nombre }}</span>
+                            <h5 class="card-title fw-bold">{{ ejercicio.nombre_ejercicio }}</h5>
+                            <p class="card-text text-muted flex-grow-1">
+                                {{ ejercicio.descripcion_ejercicio|default:"Sin descripción disponible."|truncatechars:100 }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="d-flex justify-content-center my-5">
+            <div class="alert alert-info py-4 shadow-sm text-center" style="max-width: 500px; width: 100%;">
+                <h4 class="alert-heading">¡Próximamente!</h4>
+                <p class="mb-0">Aún no hay ejercicios autorizados en el catálogo. Por favor, vuelve más tarde.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

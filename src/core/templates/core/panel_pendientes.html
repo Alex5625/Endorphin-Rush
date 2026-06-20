@@ -40,7 +40,7 @@
                                     <hr>
 
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <form action="{% url 'exercises:procesar_ejercicio' ejercicio.pk %}" method="POST" class="d-inline">
+                                        <form action="{% url 'core:procesar_ejercicio' ejercicio.pk %}" method="POST" class="d-inline">
                                             {% csrf_token %}
                                             <input type="hidden" name="accion" value="aprobar">
                                             <button type="submit" class="btn btn-success">
@@ -55,7 +55,7 @@
 
                                     <div class="collapse mt-3" id="collapseRechazo{{ ejercicio.pk }}">
                                         <div class="card card-body bg-light">
-                                            <form action="{% url 'exercises:procesar_ejercicio' ejercicio.pk %}" method="POST">
+                                            <form action="{% url 'core:procesar_ejercicio' ejercicio.pk %}" method="POST">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="accion" value="rechazar">
                                                 <div class="mb-3">
