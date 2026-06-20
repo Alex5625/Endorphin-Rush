@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4"> Panel de Autorización de Ejercicios</h2>
+            <p class="text-muted">Revisa las propuestas enviadas por los entrenadores antes de que se hagan públicas en el catálogo.</p>
+            <hr>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if ejercicios %}
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    {% for ejercicio in ejercicios %}
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">{{ ejercicio.nombre_ejercicio }}</h5>
+                                    <p class="card-text"><strong>Categoría/Tipo:</strong> {{ ejercicio.tipo_ejercicio }}</p>
+                                    <p class="card-text"><strong>Enviado por:</strong> 
+                                        {% if ejercicio.autor %}
+                                            {{ ejercicio.autor.username }} ({{ ejercicio.autor.email }})
+                                        {% else %}
+                                            <span class="text-warning">Anónimo/Sin asignar</span>
+                                        {% endif %}
+                                    </p>
+                                    <p class="card-text"><strong>Descripción propuesta:</strong></p>
+                                    <blockquote class="blockquote blockquote-footer bg-light p-2 rounded">
+                                        {{ ejercicio.descripcion_ejercicio|default:"Sin descripción proporcionada." }}
+                                    </blockquote>
+
+                                    <hr>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <form action="{% url 'exercises:procesar_ejercicio' ejercicio.pk %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="accion" value="aprobar">
+                                            <button type="submit" class="btn btn-success">
+                                                 Aprobar y Publicar
+                                            </button>
+                                        </form>
+
+                                        <button class="btn btn-outline-danger" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRechazo{{ ejercicio.pk }}">
+                                             Rechazar...
+                                        </button>
+                                    </div>
+
+                                    <div class="collapse mt-3" id="collapseRechazo{{ ejercicio.pk }}">
+                                        <div class="card card-body bg-light">
+                                            <form action="{% url 'exercises:procesar_ejercicio' ejercicio.pk %}" method="POST">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="accion" value="rechazar">
+                                                <div class="mb-3">
+                                                    <label class="form-label text-danger fw-bold">Motivo del rechazo (Se enviará por correo):</label>
+                                                    <textarea class="form-control" name="motivo_rechazo" rows="3" placeholder="Ej: La descripción requiere especificar los rangos de movimiento o la imagen no corresponde." required></textarea>
+                                                </div>
+                                                <button type="submit" class="btn btn-danger btn-sm w-100">
+                                                    Confirmar Rechazo y Eliminar
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center py-5 mt-4" role="alert">
+                    <h4 class="alert-heading">¡Todo al día!</h4>
+                    <p class="mb-0">No hay propuestas de ejercicios pendientes de revisión por el momento.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
