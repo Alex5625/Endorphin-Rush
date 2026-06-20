@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -7,6 +8,16 @@ class Ejercicio(models.Model):
         max_length=100,
         unique=True,
         verbose_name="Nombre del Ejercicio*"
+    )
+
+    # 2. Añadimos el autor. null=True y blank=True evitan conflictos con datos viejos.
+    autor = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        verbose_name="Autor/Entrenador",
+        related_name="ejercicios_creados",
+        null=True,   
+        blank=True   
     )
 
     # Relación cruzada apuntando a la app exercise_types de forma segura:
