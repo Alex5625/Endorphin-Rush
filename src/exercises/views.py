@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.core.mail import send_mail
-
+from django.contrib.auth.models import User
+from exercise_types.models import TipoEjercicio
 from .forms import ejercicioForm
 # Create your views here.
 
@@ -86,13 +87,33 @@ def eliminar_ejercicio(request, pk):
     return redirect('exercises:lista_ejercicios')
 
 ## para la hu-11 de visualización del catalago de ejercicios
+## se modifica la funcion para el cumplimiento de la hu-12
+## HU-12 Catálogo de Ejercicios con Filtros de grupos musculares y autor
 def catalogo_ejercicios(request):
-    #se filtra para traer únicamente los ejercicios que ya fueron autorizados
+    #base inicial: solo ejercicios aprobados
     ejercicios = Ejercicio.objects.filter(autorizado=True)
     
-    context = {
-        'ejercicios': ejercicios
-    }
+    #se capturan filtros desde la URL
+    grupo_seleccionado = request.GET.get('grupo')
+    autor_seleccionado = request.GET.get('autor')
     
-    #render a la plantilla HTML pasandole los ejercicios
+    #se aplica filtro de grupo muscular si existe
+    if grupo_seleccionado:
+        ejercicios = ejercicios.filter(tipo_ejercicio__id=grupo_seleccionado)
+        
+    #se aplica filtro de autor si existe
+    if autor_seleccionado:
+        ejercicios = ejercicios.filter(autor__id=autor_seleccionado)
+        
+    # Consultas para armar los selectores de la interfaz
+    grupos_musculares = TipoEjercicio.objects.all().order_by('nombre_categoria')
+    autores = User.objects.filter(ejercicios_creados__autorizado=True).distinct()
+    
+    context = {
+        'ejercicios': ejercicios,
+        'grupos_musculares': grupos_musculares,
+        'autores': autores,
+        'grupo_actual': grupo_seleccionado,
+        'autor_actual': autor_seleccionado,
+    }
     return render(request, 'exercises/catalogo.html', context)
