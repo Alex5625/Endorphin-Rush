@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.views.decorators.cache import never_cache
+from django.contrib.auth.models import Group
 
 # Create your views here.
 
@@ -22,6 +23,10 @@ def registrar_usuario(request):
             # Guardar el usuario primero para obtener su instancia y luego crear el perfil asociado
             # print("\n🚀 1. ¡EL FORMULARIO ES VÁLIDO! Iniciando guardado...")
             usuario_nuevo = form.save()
+
+            # Le asignamos la etiqueta de Gymbro al usuario que acaba de guardarse
+            grupo_gymbro, creado = Group.objects.get_or_create(name='Gymbro')
+            usuario_nuevo.groups.add(grupo_gymbro)
             
             # print(f"👤 2. Usuario creado en Auth: {usuario_nuevo.username} (ID: {usuario_nuevo.id})")
             # Crear el perfil asociado al usuario con los datos adicionales del formulario

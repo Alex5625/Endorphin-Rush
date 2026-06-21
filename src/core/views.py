@@ -270,8 +270,15 @@ def home(request):
 #     return redirect('lista_ejercicios')
 
 ##vistas exclusivas del admin
+
+def es_admin_o_staff(user):
+    if not user.is_authenticated:
+        return False
+    # staff nativo de django, super user o administrador del gimnasio (grupos)
+    return user.is_staff or user.groups.filter(name='Administrador').exists() or user.is_superuser
+
 @login_required
-@user_passes_test(lambda u: u.is_staff, login_url='home')
+@user_passes_test(es_admin_o_staff, login_url='core:home')
 def autorizar_ejercicio(request, pk, accion):
 
 ##Vista para que el admin apruebe o rechace un ejercicio.
@@ -305,7 +312,7 @@ def autorizar_ejercicio(request, pk, accion):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_staff, login_url='home')
+@user_passes_test(es_admin_o_staff, login_url='core:home')
 
 def panel_auditoria(request):
 ###Vista del panel exclusivo para que el admin vea todo el historial de movimientos
@@ -313,22 +320,17 @@ def panel_auditoria(request):
     logs = HistorialAcciones.objects.all() #viene ordenado por fecha desde el modelo
     return render(request, 'core/panel_auditoria.html', {'logs': logs})
 
-##para la autorizacion de ejercicios
-
-#filtro de seguridad: para q solo entren los administradores 
-def es_administrador(user):
-    return user.is_staff or user.is_superuser
-
 # 1- Vista para listar los ejercicios que esperan aprobación
+
 @login_required
-@user_passes_test(es_administrador)
+@user_passes_test(es_admin_o_staff, login_url='core:home')
 def panel_pendientes(request):
     ejercicios_pendientes = Ejercicio.objects.filter(autorizado=False)
     return render(request, 'core/panel_pendientes.html', {'ejercicios': ejercicios_pendientes})
 
 # 2- Vista que procesa el botón de Aprobar o Rechazar
 @login_required
-@user_passes_test(es_administrador)
+@user_passes_test(es_admin_o_staff, login_url='core:home')
 def procesar_ejercicio(request, pk):
     ejercicio = get_object_or_404(Ejercicio, pk=pk)
     
