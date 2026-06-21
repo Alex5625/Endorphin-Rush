@@ -7,6 +7,42 @@
         <p class="lead text-muted">Explora nuestra biblioteca de movimientos autorizados.</p>
     </div>
 
+    <div class="card p-3 shadow-sm mb-5 bg-light">
+        <form method="GET" action="{% url 'exercises:catalogo_ejercicios' %}" class="row g-3 align-items-center">
+            
+            <div class="col-md-5">
+                <label class="form-label fw-bold text-secondary">Grupo Muscular</label>
+                <select name="grupo" class="form-select" onchange="this.form.submit()">
+                    <option value="">— Todos los Grupos —</option>
+                    {% for grupo in grupos_musculares %}
+                        <option value="{{ grupo.id }}" {% if grupo_actual == grupo.id|stringformat:"i" %}selected{% endif %}>
+                            {{ grupo.nombre_categoria }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-5">
+                <label class="form-label fw-bold text-secondary">Entrenador / Autor</label>
+                <select name="autor" class="form-select" onchange="this.form.submit()">
+                    <option value="">— Todos los Entrenadores —</option>
+                    {% for autor in autores %}
+                        <option value="{{ autor.id }}" {% if autor_actual == autor.id|stringformat:"i" %}selected{% endif %}>
+                            {{ autor.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end h-100 mt-4 mt-md-0">
+                <a href="{% url 'exercises:catalogo_ejercicios' %}" class="btn btn-outline-danger w-100">
+                    Limpiar Filtros
+                </a>
+            </div>
+
+        </form>
+    </div>
+
     {% if ejercicios %}
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {% for ejercicio in ejercicios %}
@@ -34,8 +70,8 @@
     {% else %}
         <div class="d-flex justify-content-center my-5">
             <div class="alert alert-info py-4 shadow-sm text-center" style="max-width: 500px; width: 100%;">
-                <h4 class="alert-heading">¡Próximamente!</h4>
-                <p class="mb-0">Aún no hay ejercicios autorizados en el catálogo. Por favor, vuelve más tarde.</p>
+                <h4 class="alert-heading">¡Vaya!</h4>
+                <p class="mb-0">Aún no hay ejercicios autorizados o no hay resultados para este filtro.</p>
             </div>
         </div>
     {% endif %}
