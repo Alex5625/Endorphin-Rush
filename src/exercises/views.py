@@ -11,7 +11,12 @@ from exercise_types.models import TipoEjercicio
 from .forms import ejercicioForm
 # Create your views here.
 
+def es_coach_o_admin(user):
+    # esto es para detectar el grupo y darle o no acceso
+    return user.groups.filter(name__in=['Coach', 'Administrador']).exists() or user.is_superuser or user.is_staff
+
 @login_required
+@user_passes_test(es_coach_o_admin, login_url='core:home')
 def gestion_ejercicios(request):
     lista_ejercicios = Ejercicio.objects.all()
 
@@ -41,6 +46,7 @@ def gestion_ejercicios(request):
 
 # HU-07 permite al entrenador editar un ejercicio existente
 @login_required
+@user_passes_test(es_coach_o_admin, login_url='core:home')
 def editar_ejercicio(request, pk):
     
     ejercicio = get_object_or_404(Ejercicio, pk=pk)
@@ -70,6 +76,7 @@ def editar_ejercicio(request, pk):
     return render(request, 'exercises/editar_ejercicio.html', {'form': form, 'ejercicio': ejercicio})
 
 @login_required
+@user_passes_test(es_coach_o_admin, login_url='core:home')
 def eliminar_ejercicio(request, pk):
     
     ejercicio = get_object_or_404(Ejercicio, pk=pk)

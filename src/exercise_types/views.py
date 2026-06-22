@@ -4,10 +4,15 @@ from .models import TipoEjercicio
 from .forms import TipoEjercicioForm
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 # Create your views here.
 
+def es_coach_o_admin(user):
+    # esto es para detectar el grupo y darle o no acceso
+    return user.groups.filter(name__in=['Coach', 'Administrador']).exists()
+
 @login_required
+@user_passes_test(es_coach_o_admin, login_url='core:home')
 def gestion_tipos_ejercicio(request):
 
     categorias = TipoEjercicio.objects.all().order_by('nombre_categoria')
@@ -30,6 +35,7 @@ def gestion_tipos_ejercicio(request):
 
 #hu-30 permite al entrenador modificar el nombre de un grupo muscular existente
 @login_required
+@user_passes_test(es_coach_o_admin, login_url='core:home')
 def editar_tipo_ejercicio(request, pk):
 
     categoria = get_object_or_404(TipoEjercicio, pk=pk)
@@ -48,6 +54,7 @@ def editar_tipo_ejercicio(request, pk):
 
 #HU-31 permite al entrenador eliminar un grupo muscular en forma directa.
 @login_required
+@user_passes_test(es_coach_o_admin, login_url='core:home')
 def eliminar_tipo_ejercicio(request, pk):
 
     categoria = get_object_or_404(TipoEjercicio, pk=pk)

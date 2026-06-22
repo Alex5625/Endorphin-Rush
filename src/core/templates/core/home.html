@@ -4,7 +4,18 @@
 
 {% block content %}
     <div class="container">
-        <h1>Bienvenido a la pagina principal</h1>
+        <h1>Bienvenido a la pagina principal,</h1>
         <p>Esta es la pagina de inicio.</p>
+        
     </div>
+    {% if user.is_authenticated %}
+        <span>¡Hola, {{ user.first_name|default:user.username }}! 💪</span>
+        
+        
+    {% else %}
+        <span>
+            <a href="{% url 'authentication:login' %}">Inicia sesión</a> o 
+            <a href="{% url 'authentication:registro' %}">crea una nueva cuenta</a>
+        </span>
+    {% endif %}
 {% endblock %}
