@@ -7,4 +7,5 @@ app_name = 'exercise_plans'
 urlpatterns = [
     path('', views.gestion_rutinas_view, name='lista_rutinas'),
     path('crear/', views.crear_rutina, name='crear_rutina'),
+    path('editar/<int:pk>/', views.editar_rutina, name='editar_rutina'),
 ]

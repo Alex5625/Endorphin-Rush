@@ -45,13 +45,13 @@ class RutinaEjercicio(models.Model):
     series = models.IntegerField(default=3, verbose_name="Número de Series")
     descanso = models.IntegerField(default=20, verbose_name="Descanso entre series (segundos)")
     
-    orden = models.PositiveIntegerField(default=1, verbose_name="Orden del Ejercicio en la Rutina")
+
 
 
     class Meta:
-        ordering = ['orden']
+
         verbose_name = "Ejercicio de la Rutina"
         verbose_name_plural = "Ejercicios de la Rutina"
         
     def __str__(self):
-        return f"{self.ejercicio.nombre} en {self.rutina.nombre_rutina} (Posición {self.orden})"
+        return f"{self.ejercicio.nombre} en {self.rutina.nombre_rutina} "

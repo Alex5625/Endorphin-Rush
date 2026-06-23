@@ -13,13 +13,12 @@ class RutinaForm(forms.ModelForm):
 RutinaEjercicioFormSet = forms.inlineformset_factory(
     Rutina, 
     RutinaEjercicio, 
-    fields=['ejercicio', 'series', 'descanso', 'orden'], 
+    fields=['ejercicio', 'series', 'descanso'], 
     extra=1,
     can_delete=True,
     widgets={
         'ejercicio': forms.Select(attrs={'class': 'form-select form-select-sm'}),
         'series': forms.NumberInput(attrs={'class': 'form-control form-select-sm', 'min': 1}),
         'descanso': forms.NumberInput(attrs={'class': 'form-control form-select-sm', 'min': 0, 'planeholder': 'Segundos (ej: 60)'}),
-        'orden': forms.NumberInput(attrs={'class': 'form-control form-control-sm text-end', 'min': 1}),
     }
 )
