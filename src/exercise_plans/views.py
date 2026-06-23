@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import RutinaForm, RutinaEjercicioFormSet
 from .models import Rutina
@@ -45,3 +45,33 @@ def crear_rutina(request):
     return render(request, 'exercise_plans/crear_rutina.html', context)
             
             
+@login_required
+def editar_rutina(request, pk):
+    
+    rutina = get_object_or_404(Rutina, pk=pk)
+    
+    
+    if rutina.autor != request.user:
+        return redirect('exercise_plans:lista_rutinas')
+
+    if request.method == 'POST':
+        
+        form = RutinaForm(request.POST, instance=rutina)
+        formset = RutinaEjercicioFormSet(request.POST, instance=rutina)
+        
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            return redirect('exercise_plans:lista_rutinas')
+    else:
+        
+        form = RutinaForm(instance=rutina)
+        formset = RutinaEjercicioFormSet(instance=rutina)
+            
+    context = {
+        'form': form,
+        'formset': formset,
+        
+    }
+            
+    return render(request, 'exercise_plans/editar_rutina.html', context)
