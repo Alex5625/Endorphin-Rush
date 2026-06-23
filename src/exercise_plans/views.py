@@ -2,12 +2,18 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import RutinaForm, RutinaEjercicioFormSet
 from .models import Rutina
+from django.db.models import Q
 # Create your views here.
 
 @login_required
 def gestion_rutinas_view(request):
     # Buscamos todas las rutinas guardadas en la base de datos
-    rutinas = Rutina.objects.all() 
+    rutinas = Rutina.objects.filter(
+        Q(autor=request.user) | 
+        Q(autor__groups__name__in=['Coach', 'Administrador']) |
+        Q(autor__is_staff=True) |
+        Q(autor__is_superuser=True)
+    ).distinct()
     # Se las pasamos al HTML a través del contexto
     return render(request, 'exercise_plans/gestion_rutinas.html', {'rutinas': rutinas})
 

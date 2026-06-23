@@ -30,6 +30,7 @@ urlpatterns = [
     path('exercise_types/', include('exercise_types.urls')),
     path('exercises/', include('exercises.urls')),
     path('exercise_plans/', include('exercise_plans.urls')),
+    path('forum/', include('forum.urls')),
 ]
 
 if settings.DEBUG:

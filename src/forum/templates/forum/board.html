@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2>Foro de Entrenadores</h2>
+    {% if es_entrenador %}
+        <div class="mb-4">
+            <a href="{% url 'forum:create_post' %}" class="btn btn-primary">
+                Publicar
+            </a>
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            {% for post in publicaciones %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{post.titulo}}</h5>
+                    <h5 class="text-muted">Publicado por {{post.autor.first_name}}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ post.fecha_creacion|date:"d/m/Y" }}
+                    </h6>
+                    <hr>
+
+                    <p class="card-text"> {{ post.texto }}
+                        
+                    </p>
+
+                    {% if post.imagen %}
+                        <img src="{{ post.imagen.url }}" class="img-fluid rounded mb-3" alt="Imagen adjunta">
+                    {% endif %}
+                    
+                    {% if post.rutina_vinculada %}
+                    <div class="alert alert-info">
+                        <strong>"Rutina"</strong>
+                        {{ post.rutina_vinculada.nombre_rutina}}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="alert alert-warning text-center">
+                Aún no hay publicaciones
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock%}

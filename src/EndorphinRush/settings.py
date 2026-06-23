@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'authentication',
     'exercise_types',
     'exercises',
-    'exercise_plans'
+    'exercise_plans',
+    'forum'
 ]
 
 MIDDLEWARE = [
