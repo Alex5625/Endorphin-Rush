@@ -8,4 +8,5 @@ urlpatterns = [
     path('', views.gestion_rutinas_view, name='lista_rutinas'),
     path('crear/', views.crear_rutina, name='crear_rutina'),
     path('editar/<int:pk>/', views.editar_rutina, name='editar_rutina'),
+    path('eliminar/<int:pk>/', views.eliminar_rutina, name='eliminar_rutina')
 ]

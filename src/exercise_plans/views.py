@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import RutinaForm, RutinaEjercicioFormSet
+from django.contrib import messages
 from .models import Rutina
 from django.db.models import Q
 # Create your views here.
@@ -96,3 +97,11 @@ def editar_rutina(request, pk):
     }
             
     return render(request, 'exercise_plans/editar_rutina.html', context)
+
+@login_required
+def eliminar_rutina(request, pk):
+    rutina = get_object_or_404(Rutina, pk=pk)
+    titulo = rutina.nombre_rutina
+    rutina.delete()
+    messages.success(request, f"La rutina '{titulo}' ha sido eliminada existosamente")
+    return redirect('exercise_plans:lista_rutinas')
