@@ -50,6 +50,13 @@
                                             <i class="bi bi-pencil-square me-2"></i>Editar Rutina
                                         </a>
                                     </div>
+                                {% else %}
+                                    <form action="{% url 'exercise_plans:guardar_rutina' rutina.id %}" method="POST" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm shadow-sm fw-bold mt-2">
+                                            <i class="bi bi-plus-circle me-2"></i>Guardar en mi rutina
+                                        </button>
+                                    </form>
                                 {% endif %}
                             </div>
                             {% if rutina.rutinaejercicio_set.all %}
