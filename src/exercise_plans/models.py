@@ -50,9 +50,6 @@ class RutinaEjercicio(models.Model):
     
     series = models.IntegerField(default=3, verbose_name="Número de Series")
     descanso = models.IntegerField(default=20, verbose_name="Descanso entre series (segundos)")
-    
-
-
 
     class Meta:
 

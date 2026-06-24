@@ -36,6 +36,18 @@
                     <div class="alert alert-info">
                         <strong>"Rutina"</strong>
                         {{ post.rutina_vinculada.nombre_rutina}}
+                        <div class="mt-3 p-3 bg-light border rounded">
+                            <h6 class="text-primary mb-2">
+                                <i class="bi bi-fire me-1"></i> Rutina Recomendada: {{ post.rutina_vinculada.nombre }}
+                            </h6>
+                            
+                            <form action="{% url 'exercise_plans:guardar_rutina' post.rutina_vinculada.id %}" method="POST" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm shadow-sm fw-bold">
+                                    <i class="bi bi-plus-circle me-2"></i>Guardar en mi rutina
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     {% endif %}
                 </div>

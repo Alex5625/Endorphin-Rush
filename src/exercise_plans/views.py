@@ -96,3 +96,30 @@ def editar_rutina(request, pk):
     }
             
     return render(request, 'exercise_plans/editar_rutina.html', context)
+
+
+@login_required
+def mis_rutinas(request):
+    mis_rutinas = Rutina.objects.filter(autor=request.user)
+    return render(request, 'exercise_plans/mis_rutinas.html', {'rutinas': mis_rutinas})
+
+@login_required
+def guardar_rutina(request, rutina_id):
+    if request.method == 'POST':
+        rutina_original = get_object_or_404(Rutina, id=rutina_id)
+        mis_ejercicios_og = list(rutina_original.rutinaejercicio_set.all())
+        rutina_original.pk = None
+        rutina_original.autor = request.user
+        rutina_original.publico = False
+        rutina_original.nombre_rutina = f"{rutina_original.nombre_rutina} (Copia por {request.user.username})"
+
+        rutina_original.save()
+        mi_nueva_rutina = rutina_original
+
+        for ejercicio in mis_ejercicios_og:
+            ejercicio.pk = None
+            ejercicio.rutina = mi_nueva_rutina
+            ejercicio.save()
+
+        return redirect('exercise_plans:mis_rutinas')
+    return redirect('forum:board')
