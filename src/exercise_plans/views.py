@@ -74,8 +74,8 @@ def editar_rutina(request, pk):
 
             ejercicios = formset.save(commit=False)
             for contador, ejercicio in enumerate(ejercicios, start=1):
-                if not ejercicio.orden:
-                    ejercicio.orden = contador
+                
+                ejercicio.orden = contador
                 ejercicio.save()
                 
             for obj in formset.deleted_objects:
