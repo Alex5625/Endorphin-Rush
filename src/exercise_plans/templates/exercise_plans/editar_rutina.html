@@ -87,7 +87,22 @@
                                     </td>
                                     {% endif %}
                                 </tr>
-                            {% endfor %}
+                                {% endfor %}
+                                {% if form.publico %}
+                                    <div class="mb-4 p-3 bg-light border rounded">
+                                        <div class="form-check form-switch">
+                                            {{ form.publico }}
+                                            <label class="form-check-label fw-bold text-success" for="{{ form.publico.id_for_label }}">
+                                                Hacer esta rutina Pública 🌐
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">Si activas este interruptor, la rutina aparecerá en el muro y otros usuarios podrán verla.</small>
+                                        
+                                        {% if form.publico.errors %}
+                                            <div class="text-danger small mt-1">{{ form.publico.errors|join:", " }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
                         </tbody>
                     </table>
                 </div>

@@ -10,10 +10,7 @@ def gestion_rutinas_view(request):
     # Buscamos todas las rutinas guardadas en la base de datos
     rutinas = Rutina.objects.filter(
         Q(autor=request.user) | 
-        Q(autor__groups__name__in=['Coach', 'Administrador']) |
-        Q(autor__is_staff=True) |
-        Q(autor__is_superuser=True)
-    ).distinct()
+        Q(publico=True)).distinct()
     # Se las pasamos al HTML a través del contexto
     return render(request, 'exercise_plans/gestion_rutinas.html', {'rutinas': rutinas})
 
@@ -60,19 +57,37 @@ def editar_rutina(request, pk):
     if rutina.autor != request.user:
         return redirect('exercise_plans:lista_rutinas')
 
+    es_coach = request.user.groups.filter(name__in=['Coach', 'Administrador']).exists() or request.user.is_staff
+
     if request.method == 'POST':
         
         form = RutinaForm(request.POST, instance=rutina)
         formset = RutinaEjercicioFormSet(request.POST, instance=rutina)
         
         if form.is_valid() and formset.is_valid():
-            form.save()
-            formset.save()
+            rutina_editada = form.save(commit=False)
+            
+            if not es_coach:
+                rutina_editada.publico = False
+                
+            rutina_editada.save()
+
+            ejercicios = formset.save(commit=False)
+            for contador, ejercicio in enumerate(ejercicios, start=1):
+                if not ejercicio.orden:
+                    ejercicio.orden = contador
+                ejercicio.save()
+                
+            for obj in formset.deleted_objects:
+                obj.delete()
+                
             return redirect('exercise_plans:lista_rutinas')
     else:
         
         form = RutinaForm(instance=rutina)
         formset = RutinaEjercicioFormSet(instance=rutina)
+        if not es_coach and 'publico' in form.fields:
+            del form.fields['publico']
             
     context = {
         'form': form,

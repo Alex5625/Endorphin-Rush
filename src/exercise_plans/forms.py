@@ -4,7 +4,7 @@ from .models import Rutina, RutinaEjercicio
 class RutinaForm(forms.ModelForm):
     class Meta:
         model = Rutina
-        fields = ['nombre_rutina', 'descripcion_rutina']
+        fields = ['nombre_rutina', 'descripcion_rutina', 'publico']
         widgets = {
             'nombre_rutina': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Rutina de Pecho'}),
             'descripcion_rutina': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción de la rutina...', 'rows': 4}),

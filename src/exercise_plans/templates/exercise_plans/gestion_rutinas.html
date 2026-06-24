@@ -44,11 +44,13 @@
                                     {% endif %}
                                 </div> 
 
-                                <div>
-                                    <a href="{% url 'exercise_plans:editar_rutina' rutina.id %}" class="btn btn-warning px-4 shadow-sm text-dark fw-medium">
-                                        <i class="bi bi-pencil-square me-2"></i>Editar Rutina
-                                    </a>
-                                </div>
+                                {% if rutina.autor == request.user %}
+                                    <div>
+                                        <a href="{% url 'exercise_plans:editar_rutina' rutina.id %}" class="btn btn-warning px-4 shadow-sm text-dark fw-medium">
+                                            <i class="bi bi-pencil-square me-2"></i>Editar Rutina
+                                        </a>
+                                    </div>
+                                {% endif %}
                             </div>
                             {% if rutina.rutinaejercicio_set.all %}
                                 <div class="d-flex flex-column gap-3">
