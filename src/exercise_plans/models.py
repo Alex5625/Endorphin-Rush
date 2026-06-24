@@ -7,7 +7,6 @@ from exercises.models import Ejercicio
 class Rutina(models.Model):
     nombre_rutina = models.CharField(
         max_length=100,
-        unique=True,
         verbose_name="Nombre de la Rutina*"
     )
 
@@ -39,7 +38,14 @@ class Rutina(models.Model):
     class Meta:
         verbose_name = "Rutina"
         verbose_name_plural = "Rutinas"
-        
+
+    constraints = [
+            models.UniqueConstraint(
+                fields=['autor', 'nombre_rutina'], 
+                name='unique_rutina_per_user'
+            )
+    ] 
+    
     def __str__(self):
         return f"{self.nombre_rutina} (por {self.autor.username})"
 
@@ -50,9 +56,6 @@ class RutinaEjercicio(models.Model):
     
     series = models.IntegerField(default=3, verbose_name="Número de Series")
     descanso = models.IntegerField(default=20, verbose_name="Descanso entre series (segundos)")
-    
-
-
 
     class Meta:
 

@@ -50,6 +50,13 @@
                                             <i class="bi bi-pencil-square me-2"></i>Editar Rutina
                                         </a>
                                     </div>
+                                {% else %}
+                                    <form action="{% url 'exercise_plans:guardar_rutina' rutina.id %}" method="POST" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm shadow-sm fw-bold mt-2">
+                                            <i class="bi bi-plus-circle me-2"></i>Guardar en mi rutina
+                                        </button>
+                                    </form>
                                     <div>
                                             <a href="{% url 'exercise_plans:eliminar_rutina' rutina.id %}" class="btn btn-danger px-4 shadow-sm text-dark fw-medium">
                                                 <i class="bi bi-pencil-square me-2"></i>Eliminar Rutina

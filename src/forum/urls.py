@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.forum_board, name='board'),
     
     path('crear/', views.crear_publicacion, name='create_post'),
+    
 ]
