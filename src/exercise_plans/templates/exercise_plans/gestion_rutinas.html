@@ -4,12 +4,20 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-dark mb-1">Gestión de Planes</h2>
-            <p class="text-muted mb-0">Visualiza, organiza y administra tus rutinas de entrenamiento.</p>
+            {% if action == 'personal' %}
+                <h2 class="fw-bold text-dark mb-1">Mis Rutinas Personales</h2>
+                <p class="text-muted mb-0">Visualiza, organiza y administra tus rutinas de entrenamiento.</p>
+            {% else %}
+                <h2 class="fw-bold text-dark mb-1">Rutinas publicadas por los entrenadores</h2>
+                <p class="text-muted mb-0">Explora el catálogo de la comunidad y guarda planes en tu perfil.</p>
+            {% endif %}
         </div>
-        <a href="{% url 'exercise_plans:crear_rutina' %}" class="btn btn-primary px-4 shadow-sm">
-            <i class="bi bi-plus-lg me-2"></i>Nueva Rutina
-        </a>
+        
+        {% if action == 'personal' %}
+            <a href="{% url 'exercise_plans:crear_rutina' %}" class="btn btn-primary px-4 shadow-sm">
+                <i class="bi bi-plus-lg me-2"></i>Nueva Rutina
+            </a>
+        {% endif %}
     </div>
 
     {% if rutinas %}
@@ -46,27 +54,27 @@
                                     {% endif %}
                                 </div> 
 
-                                <div class="d-flex flex-wrap gap-2">
-                                    
-                                    {% if rutina.autor == request.user %}
+                                {% if rutina.autor == request.user %}
+                                    <div class="d-flex gap-2">
                                         <a href="{% url 'exercise_plans:editar_rutina' rutina.id %}" class="btn btn-warning px-4 shadow-sm text-dark fw-medium">
                                             <i class="bi bi-pencil-square me-2"></i>Editar
                                         </a>
-                                        <a href="{% url 'exercise_plans:eliminar_rutina' rutina.id %}" class="btn btn-danger px-4 shadow-sm text-white fw-medium">
-                                            <i class="bi bi-trash3 me-2"></i>Eliminar
-                                        </a>
                                         
-                                    {% else %}
-                                        <form action="{% url 'exercise_plans:guardar_rutina' rutina.id %}" method="POST" class="m-0">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-primary btn-sm shadow-sm fw-bold">
-                                                <i class="bi bi-plus-circle me-2"></i>Guardar en mi rutina
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                    
-                                </div> </div> {% if rutina.rutinaejercicio_set.all %}
-                                <div class="d-flex flex-column gap-3 w-100">
+                                        <a href="{% url 'exercise_plans:eliminar_rutina' rutina.id %}" class="btn btn-danger px-4 shadow-sm text-white fw-medium">
+                                            <i class="bi bi-trash me-2"></i>Eliminar
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <form action="{% url 'exercise_plans:guardar_rutina' rutina.id %}" method="POST" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm shadow-sm fw-bold mt-2">
+                                            <i class="bi bi-plus-circle me-2"></i>Guardar en mi rutina
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                            {% if rutina.rutinaejercicio_set.all %}
+                                <div class="d-flex flex-column gap-3 mt-4">
                                     {% for item in rutina.rutinaejercicio_set.all %}
                                         <div class="card border-0 shadow-sm rounded-4 p-3 bg-white position-relative">
                                             <div class="d-flex align-items-center justify-content-between w-100">
@@ -96,6 +104,11 @@
                                         </div>
                                     {% endfor %}
                                 </div>
+                            {% else %}
+                                <div class="alert alert-light border border-dashed text-center p-4 mt-4" role="alert">
+                                    <i class="bi bi-patch-exclamation text-muted fs-3 d-block mb-2"></i>
+                                    <span class="text-muted small">No hay ejercicios cargados en esta rutina todavía.</span>
+                                </div>
                             {% endif %}
 
                         </div>
@@ -107,8 +120,13 @@
     {% else %}
         <div class="text-center py-5 bg-white rounded shadow-sm border mt-4">
             <i class="bi bi-journal-x text-muted display-1"></i>
-            <h4 class="mt-3 fw-semibold">No hay rutinas creadas aún</h4>
-            <p class="text-muted">Sé el primero en estructurar un plan de entrenamiento haciendo clic en el botón superior.</p>
+            {% if action == 'personal' %}
+                <h4 class="mt-3 fw-semibold">No tienes rutinas creadas aún</h4>
+                <p class="text-muted">Sé el primero en estructurar un plan de entrenamiento haciendo clic en "Nueva Rutina".</p>
+            {% else %}
+                <h4 class="mt-3 fw-semibold">No hay planes en la comunidad</h4>
+                <p class="text-muted">Actualmente los entrenadores no han publicado rutinas públicas.</p>
+            {% endif %}
         </div>
     {% endif %}
 </div>
