@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import TerminosCondiciones
 
-# Register your models here.
+
+#se registra el modelo para que aparezca en el panel
+admin.site.register(TerminosCondiciones)
