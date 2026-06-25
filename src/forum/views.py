@@ -29,7 +29,7 @@ def crear_publicacion(request):
         form = PostForm(request.POST, request.FILES)
         
         form.fields['rutina_vinculada'].queryset = Rutina.objects.filter(
-            Q(publico=True)).distinct()
+            Q(autor=request.user) & Q(publico=True)).distinct()
             
         if form.is_valid():
             new_post = form.save(commit=False)
@@ -39,6 +39,6 @@ def crear_publicacion(request):
     else:
         form = PostForm()
         form.fields['rutina_vinculada'].queryset = Rutina.objects.filter(
-            Q(publico=True)).distinct()
+            Q(autor=request.user) & Q(publico=True)).distinct()
 
     return render(request, 'forum/create_post.html', {'form':form}) 
