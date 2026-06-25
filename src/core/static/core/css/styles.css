@@ -1,4 +1,10 @@
 /* core/static/core/css/style.css */
+:root {
+  --primary-color: #850dfd;
+  --secondary-color: #ffb649;
+  --dark: #310a75;
+  --light-text: #ffda9d;
+}
 
 .custom-nav-link {
     transition: all 0.2s ease-in-out;
@@ -6,13 +12,13 @@
 }
 
 .custom-nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: var(--dark);
     color: #fff !important;
 }
 
 .navbar-nav .nav-link.active {
-    background-color: rgba(13, 110, 253, 0.15) !important;
-    color: #0d6efd !important;
+    background-color: rgba(109, 13, 253, 0.15) !important;
+    color: var(--primary-color) !important;
     font-weight: 600;
 }
 
@@ -41,7 +47,27 @@
 .inputs-elegantes input:focus {
     color: #212529;
     background-color: #fff;
-    border-color: #86b7fe;
+    border-color: #ce86fe;
     outline: 0;
-    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+    box-shadow: 0 0 0 0.25rem rgba(121, 13, 253, 0.25);
+}
+
+/*navbar*/
+
+#navbar_endorphin {
+    backdrop-filter: blur(10px);
+    background-color: rgba(50, 32, 79, 0.95) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#brand_endorphin {
+    width: 38px;
+    height: 38px;
+    background-color: var(--primary-color) !important;
+}
+
+.btn {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    border: #ce86fe !important;
 }
