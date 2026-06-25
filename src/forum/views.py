@@ -10,7 +10,7 @@ from django.db.models import Q
 def es_entrenador_o_admin(user):
     if not user.is_authenticated:
         return False
-    return user.is_staff or user.groups.filter(name__in=['Coach', 'Administrador']).exists()
+    return user.is_staff or user.is_superuser or user.groups.filter(name__in=['Coach', 'Administrador']).exists()
 
 @login_required
 def forum_board(request):

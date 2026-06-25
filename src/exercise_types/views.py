@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 
 def es_coach_o_admin(user):
     # esto es para detectar el grupo y darle o no acceso
-    return user.groups.filter(name__in=['Coach', 'Administrador']).exists()
+    return user.groups.filter(name__in=['Coach', 'Administrador']).exists() or user.is_superuser or user.is_staff
 
 @login_required
 @user_passes_test(es_coach_o_admin, login_url='core:home')
