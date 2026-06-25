@@ -58,7 +58,7 @@ def editar_rutina(request, pk):
     if rutina.autor != request.user:
         return redirect('exercise_plans:lista_rutinas')
 
-    es_coach = request.user.groups.filter(name__in=['Coach', 'Administrador']).exists() or request.user.is_staff
+    es_coach = request.user.groups.filter(name__in=['Coach', 'Administrador']).exists() or request.user.is_staff or request.user.is_superuser
 
     if request.method == 'POST':
         
@@ -124,6 +124,7 @@ def guardar_rutina(request, rutina_id):
 
         return redirect('exercise_plans:mis_rutinas')
     return redirect('forum:board')
+
 @login_required
 def eliminar_rutina(request, pk):
     rutina = get_object_or_404(Rutina, pk=pk)

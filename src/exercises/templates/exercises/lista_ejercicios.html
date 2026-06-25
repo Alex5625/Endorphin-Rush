@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Catálogo de Ejercicios{% endblock %}
+{% block title %}Gestión de Ejercicios{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-black">Catálogo de Ejercicios</h2>
+        <h2 class="text-black">Gestión de Ejercicios</h2>
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAgregar">
             + Nuevo Ejercicio
         </button>
@@ -89,5 +89,12 @@
             </form>
         </div>
     </div>
+</div>
+
+<div>
+    <a href="{% url 'exercise_types:gestion_tipos_ejercicio' %}" class="btn btn-primary shadow-sm fw-bold">
+        <i class="bi bi-arrow-right-circle me-2"></i> Modificar categorías de ejercicio
+    </a>
+
 </div>
 {% endblock %}
