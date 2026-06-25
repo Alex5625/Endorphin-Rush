@@ -17,6 +17,10 @@ class RegistroCompletoForm(UserCreationForm):
     sexo = forms.ChoiceField(choices=PerfilUsuario.SEXO_CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
     peso = forms.FloatField(widget=forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1', 'placeholder': 'En kg'}))
     altura = forms.FloatField(widget=forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': 'Ej. 1.75'}))
+    terminos_y_condiciones = forms.BooleanField(
+        required=True,
+        error_messages={'required': 'Debes aceptar los términos y condiciones para registrarte.'}
+    )
 
     
     class Meta(UserCreationForm.Meta):
@@ -55,8 +59,11 @@ class RegistroCompletoForm(UserCreationForm):
                 # Asignamos el nuevo formato
                 field.label = f"{label_actual} *"
             
-        for field in self.fields.values():
-            field.widget.attrs["class"] = "form-control"
+        #for field in self.fields.values():
+        #    field.widget.attrs["class"] = "form-control"
+        for nombre_campo, field in self.fields.items():
+            if nombre_campo != 'terminos_y_condiciones':
+                field.widget.attrs["class"] = "form-control"
     
     def clean_email(self):
         email = self.cleaned_data.get('email')

@@ -17,3 +17,14 @@ class HistorialAcciones(models.Model):
     def __str__(self):
         usuario_str = self.usuario.username if self.usuario else "Sistema/Anónimo"
         return f"{usuario_str} - {self.accion} ({self.fecha.strftime('%d/%m/%Y %H:%M')})"  
+    
+class TerminosCondiciones(models.Model):
+    contenido = models.TextField(verbose_name="Texto Legal", help_text="Escribe aquí todos los términos y condiciones. Se respetarán los saltos de línea.")
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Términos y Condiciones"
+        verbose_name_plural = "Términos y Condiciones"
+
+    def __str__(self):
+        return f"Términos actualizados el {self.fecha_actualizacion.strftime('%d/%m/%Y')}"

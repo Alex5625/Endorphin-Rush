@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import PerfilUsuario
-from core.models import HistorialAcciones
+from core.models import HistorialAcciones, TerminosCondiciones
 from .forms import RegistroCompletoForm, EditarPerfilForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -72,8 +72,10 @@ def registrar_usuario(request):
         #     print("="*50 + "\n")
     else:
         form = RegistroCompletoForm()
-        
-    return render(request, 'authentication/registro.html', {'form': form})
+        # Buscamos el texto legal activo
+    terminos = TerminosCondiciones.objects.first()
+
+    return render(request, 'authentication/registro.html', {'form': form, 'terminos': terminos})
 
 
 def enviar_correo(perfil, correo_destino):
