@@ -1,18 +1,28 @@
 /* core/static/core/css/style.css */
+:root {
+  --primary-color: #850dfd;
+  --secondary-color: #ffb649;
+  --tertiary-color: #b6f97f;
+  --dark: #310a75;
+  --light-text: #ffda9d;
+  --shadow: 1px 2px 1px rgba(0, 0, 0, 0.175) !important;
+}
 
 .custom-nav-link {
     transition: all 0.2s ease-in-out;
     font-weight: 500;
+    font-size: 15px;
+    text-align: center;
 }
 
 .custom-nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: var(--dark);
     color: #fff !important;
 }
 
 .navbar-nav .nav-link.active {
-    background-color: rgba(13, 110, 253, 0.15) !important;
-    color: #0d6efd !important;
+    background-color: rgba(109, 13, 253, 0.15) !important;
+    color: var(--primary-color) !important;
     font-weight: 600;
 }
 
@@ -41,7 +51,99 @@
 .inputs-elegantes input:focus {
     color: #212529;
     background-color: #fff;
-    border-color: #86b7fe;
+    border-color: #ce86fe;
     outline: 0;
-    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+    box-shadow: 0 0 0 0.25rem rgba(121, 13, 253, 0.25);
+}
+
+/*navbar*/
+
+.navbar {
+    background: #310A75 !important;
+    background: linear-gradient(0deg,rgba(29, 0, 80, 0.619) 0%, rgba(0, 0, 0, 1) 47%) !important;
+    backdrop-filter: blur(10px);
+
+}
+
+#brand_endorphin {
+    width: 38px;
+    height: 38px;
+    background-color: var(--primary-color) !important;
+}
+
+.navbar .btn {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    border: #ce86fe !important;
+}
+
+/*ejercicios*/
+
+#card_ejercicio {
+    box-shadow: var(--shadow);
+    border: none !important;
+}
+
+#aprobado{
+    background-color: var(--tertiary-color);
+    box-shadow: 0 0.125rem 0.25rem var(--tertiary-color);
+}
+
+#pendiente {
+    background-color: var(--secondary-color);
+    box-shadow: 0 0.125rem 0.25rem var(--secondary-color);
+}
+
+.boton-agregar {
+    background: var(--primary-color) !important;
+    color: white;
+    font-weight: bold;
+}
+
+.boton-agregar:hover {
+    background-color: #ce86fe !important;
+}
+
+.texto-titulo {
+    color: #310a75 !important;
+    font-weight: bold !important;
+    font-size: xx-large !important;
+}
+
+.agregar-tipoejercicio {
+    background-color: #850dfd !important;
+}
+
+.boton-verde {
+    background-color: var(--tertiary-color);
+}
+
+.boton-verde:hover {
+    background-color: #d5ffb2;
+}
+
+.boton-eliminar {
+    background-color: var(--secondary-color);
+}
+
+.boton-eliminar:hover {
+    background-color: #ffda9d;
+}
+
+.rutina-recomendada {
+    background-color: #e6c9f9;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.titulo-publicacion {
+    color: #850dfd;
+    font-weight: bold;
+    font-size: larger;
+}
+
+.detalles-publicacion {
+    color: #878787;
+    font-weight: bold;
+    font-size:small;
 }

@@ -124,7 +124,7 @@
                     <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn btn-outline-secondary me-2 px-4">
                         Cancelar
                     </a>
-                    <button type="submit" class="btn {% if action == 'editar' %}btn-warning{% else %}btn-success{% endif %} px-4">
+                    <button type="submit" class="btn {% if action == 'editar' %}boton-eliminar{% else %}boton-verde{% endif %} px-4">
                         {% if action == 'editar' %}
                             Guardar Cambios
                         {% else %}
