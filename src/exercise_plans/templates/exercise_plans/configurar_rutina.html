@@ -24,12 +24,45 @@
                             <div class="text-danger small mt-1">{{ form.nombre_rutina.errors|join:", " }}</div>
                         {% endif %}
                     </div>
-                    <div class="col-md-12">
+                    <div class="col-md-12 mb-4">
                         <label class="form-label fw-bold">{{ form.descripcion_rutina.label }}</label>
                         {{ form.descripcion_rutina }}
                         {% if form.descripcion_rutina.errors %}
                             <div class="text-danger small mt-1">{{ form.descripcion_rutina.errors|join:", " }}</div>
                         {% endif %}
+                    </div>
+                    
+                    <!-- 📅 NUEVA SECCIÓN: AGENDA SEMANAL -->
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold"><i class="bi bi-calendar-check me-2"></i>Programar en la Semana</label>
+                        <p class="text-muted small mb-2">Selecciona los días que entrenarás esta rutina. No puedes repetir días con otras rutinas.</p>
+                        
+                        <div class="d-flex flex-wrap gap-2" role="group">
+                            {% for field in form %}
+                                {% if field.name in 'lunes martes miercoles jueves viernes sabado domingo' %}
+                                    <div>
+                                        {{ field }}
+                                        <label class="btn btn-outline-primary px-3 fw-medium" for="{{ field.id_for_label }}">
+                                            {{ field.label }}
+                                        </label>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- Mostrar errores de validación de los días (Ej: si un día ya está ocupado) -->
+                        <div class="mt-2">
+                            {% for field in form %}
+                                {% if field.name in 'lunes martes miercoles jueves viernes sabado domingo' %}
+                                    {% if field.errors %}
+                                        <div class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>{{ field.errors|join:", " }}</div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if form.non_field_errors %}
+                                <div class="text-danger small fw-bold mt-1">{{ form.non_field_errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 
@@ -124,7 +157,7 @@
                     <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn btn-outline-secondary me-2 px-4">
                         Cancelar
                     </a>
-                    <button type="submit" class="btn {% if action == 'editar' %}boton-eliminar{% else %}boton-verde{% endif %} px-4">
+                    <button type="submit" class="btn {% if action == 'editar' %}btn-warning{% else %}btn-success{% endif %} px-4">
                         {% if action == 'editar' %}
                             Guardar Cambios
                         {% else %}

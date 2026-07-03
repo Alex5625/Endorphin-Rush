@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.core.exceptions import ValidationError
 from exercises.models import Ejercicio
 # Create your models here.
 
@@ -45,10 +45,48 @@ class Rutina(models.Model):
                 name='unique_rutina_per_user'
             )
     ] 
-    
+
+    lunes = models.BooleanField(default=False, verbose_name="Lunes")
+    martes = models.BooleanField(default=False, verbose_name="Martes")
+    miercoles = models.BooleanField(default=False, verbose_name="Miércoles")
+    jueves = models.BooleanField(default=False, verbose_name="Jueves")
+    viernes = models.BooleanField(default=False, verbose_name="Viernes")
+    sabado = models.BooleanField(default=False, verbose_name="Sábado")
+    domingo = models.BooleanField(default=False, verbose_name="Domingo")
+
+    class Meta:
+        verbose_name = "Rutina"
+        verbose_name_plural = "Rutinas"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['autor', 'nombre_rutina'], 
+                name='unique_rutina_per_user'
+            )
+        ] 
+        
+    def clean(self):
+        super().clean()
+        
+        dias_semana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']
+        
+        for dia in dias_semana:
+            # Si el usuario marcó este día como True en el formulario...
+            if getattr(self, dia):
+                # Buscamos si ya tiene OTRA rutina que ocupe ese mismo día
+                # (Usamos exclude para ignorar esta misma rutina si la estamos editando)
+                rutinas_conflicto = Rutina.objects.filter(
+                    autor=self.autor, 
+                    **{dia: True}
+                ).exclude(pk=self.pk)
+                
+                if rutinas_conflicto.exists():
+                    nombre_conflicto = rutinas_conflicto.first().nombre_rutina
+                    raise ValidationError({
+                        dia: f"Día bloqueado. Ya ocupado por tu rutina '{nombre_conflicto}'."
+                    })
+
     def __str__(self):
         return f"{self.nombre_rutina} (por {self.autor.username})"
-
 
 class RutinaEjercicio(models.Model):
     rutina = models.ForeignKey(Rutina, on_delete=models.CASCADE)
