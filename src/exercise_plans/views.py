@@ -98,10 +98,15 @@ def editar_rutina(request, pk):
         'rutina': rutina
     }
     return render(request, 'exercise_plans/configurar_rutina.html', context)
+
 @login_required
 def guardar_rutina(request, rutina_id):
     if request.method == 'POST':
-        rutina_original = get_object_or_404(Rutina, id=rutina_id)
+        # 🛡️ FIX IDOR: Solo permitimos clonar si es pública o si le pertenece al usuario
+        rutina_original = get_object_or_404(
+            Rutina, 
+            Q(id=rutina_id) & (Q(publico=True) | Q(autor=request.user))
+        )
         mis_ejercicios_og = list(rutina_original.rutinaejercicio_set.all())
         
         rutina_original.pk = None
@@ -137,7 +142,6 @@ def guardar_rutina(request, rutina_id):
         
     return redirect('forum:board')
 
-
 # Esta es la vista que debe renderizar el home.html
 def home_view(request):
     context = {}
@@ -157,7 +161,8 @@ def home_view(request):
         }
         context['agenda'] = agenda
         
-    return render(request, 'core/home.html', context)
+    return render(request, 'core/home.html', context)
+
 @login_required
 def eliminar_rutina(request, pk):
     rutina = get_object_or_404(Rutina, pk=pk)

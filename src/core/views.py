@@ -1,8 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-#from .models import Ejercicio, PerfilUsuario, TipoEjercicio, HistorialAcciones
-#from .forms import RegistroCompletoForm, EditarPerfilForm , TipoEjercicioForm, ejercicioForm
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.contrib import messages
@@ -10,27 +8,25 @@ from django.views.decorators.cache import never_cache
 from core.models import HistorialAcciones
 from exercises.models import Ejercicio
 from exercise_plans.models import Rutina
- # Create your views here.
- 
+
 def home(request):
     context = {}
     
-    # 2. Solo buscamos la agenda si el usuario inició sesión
     if request.user.is_authenticated:
-        rutinas_usuario = Rutina.objects.filter(autor=request.user)
+        # Obtenemos TODAS las rutinas del usuario en una sola consulta a la base de datos
+        rutinas_usuario = list(Rutina.objects.filter(autor=request.user))
         
-        # 3. Armamos el calendario buscando qué rutina tiene marcado cada día en True
+        # Armamos el calendario buscando en la lista en memoria usando 'next'
         agenda = {
-            'Lunes': rutinas_usuario.filter(lunes=True).first(),
-            'Martes': rutinas_usuario.filter(martes=True).first(),
-            'Miércoles': rutinas_usuario.filter(miercoles=True).first(),
-            'Jueves': rutinas_usuario.filter(jueves=True).first(),
-            'Viernes': rutinas_usuario.filter(viernes=True).first(),
-            'Sábado': rutinas_usuario.filter(sabado=True).first(),
-            'Domingo': rutinas_usuario.filter(domingo=True).first(),
+            'Lunes': next((r for r in rutinas_usuario if r.lunes), None),
+            'Martes': next((r for r in rutinas_usuario if r.martes), None),
+            'Miércoles': next((r for r in rutinas_usuario if r.miercoles), None),
+            'Jueves': next((r for r in rutinas_usuario if r.jueves), None),
+            'Viernes': next((r for r in rutinas_usuario if r.viernes), None),
+            'Sábado': next((r for r in rutinas_usuario if r.sabado), None),
+            'Domingo': next((r for r in rutinas_usuario if r.domingo), None),
         }
         
-        # 4. Enviamos la agenda al HTML
         context['agenda'] = agenda
         
     return render(request, 'core/home.html', context)

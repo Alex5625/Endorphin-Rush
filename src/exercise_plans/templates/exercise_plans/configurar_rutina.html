@@ -31,39 +31,37 @@
                             <div class="text-danger small mt-1">{{ form.descripcion_rutina.errors|join:", " }}</div>
                         {% endif %}
                     </div>
-                    
+                                        
                     <!-- 📅 NUEVA SECCIÓN: AGENDA SEMANAL -->
                     <div class="col-md-12">
                         <label class="form-label fw-bold"><i class="bi bi-calendar-check me-2"></i>Programar en la Semana</label>
                         <p class="text-muted small mb-2">Selecciona los días que entrenarás esta rutina. No puedes repetir días con otras rutinas.</p>
                         
-                            <div class="d-flex flex-wrap gap-2" role="group">
+                        <div class="d-flex flex-wrap gap-2" role="group">
+                            <div>{{ form.lunes }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.lunes.id_for_label }}">{{ form.lunes.label }}</label></div>
+                            <div>{{ form.martes }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.martes.id_for_label }}">{{ form.martes.label }}</label></div>
+                            <div>{{ form.miercoles }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.miercoles.id_for_label }}">{{ form.miercoles.label }}</label></div>
+                            <div>{{ form.jueves }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.jueves.id_for_label }}">{{ form.jueves.label }}</label></div>
+                            <div>{{ form.viernes }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.viernes.id_for_label }}">{{ form.viernes.label }}</label></div>
+                            
+                            <!-- Agregamos el fin de semana para que el usuario pueda seleccionarlos -->
+                            <div>{{ form.sabado }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.sabado.id_for_label }}">{{ form.sabado.label }}</label></div>
+                            <div>{{ form.domingo }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.domingo.id_for_label }}">{{ form.domingo.label }}</label></div>
+                        </div>
 
-                                <div>{{ form.lunes }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.lunes.id_for_label }}">{{ form.lunes.label }}</label></div>
-
-                                <div>{{ form.martes }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.martes.id_for_label }}">{{ form.martes.label }}</label></div>
-
-                                <div>{{ form.miercoles }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.miercoles.id_for_label }}">{{ form.miercoles.label }}</label></div>
-
-                                <div>{{ form.jueves }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.jueves.id_for_label }}">{{ form.jueves.label }}</label></div>
-
-                                <div>{{ form.viernes }}<label class="btn btn-outline-primary px-3 fw-medium" for="{{ form.viernes.id_for_label }}">{{ form.viernes.label }}</label></div>
-
-                            {% if form.lunes.errors %}<div class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>{{ form.lunes.errors|join:", " }}</div>{% endif %}
-                            {% if form.martes.errors %}<div class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>{{ form.martes.errors|join:", " }}</div>{% endif %}
-                            {% if form.miercoles.errors %}<div class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>{{ form.miercoles.errors|join:", " }}</div>{% endif %}
-                            {% if form.jueves.errors %}<div class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>{{ form.jueves.errors|join:", " }}</div>{% endif %}
-                            {% if form.viernes.errors %}<div class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>{{ form.viernes.errors|join:", " }}</div>{% endif %}
-                            {% if form.sabado.errors %}<div class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>{{ form.sabado.errors|join:", " }}</div>{% endif %}
-                            {% if form.domingo.errors %}<div class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>{{ form.domingo.errors|join:", " }}</div>{% endif %}
-                        <!-- Mostrar errores de validación de los días (Ej: si un día ya está ocupado) -->
+                    <!-- Mostrar errores de validación de los días -->
                         <div class="mt-2">
                             {% for field in form %}
                                 {% if field.name in 'lunes martes miercoles jueves viernes sabado domingo' %}
-                                        <div class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle me-1"></i>{{ field.errors|join:", " }}</div>
+                                    {% if field.errors %}
+                                        <div class="text-danger small fw-bold mb-1">
+                                            <!-- 🔥 Aquí agregamos {{ field.label }} para saber qué día falló -->
+                                            <i class="bi bi-exclamation-triangle me-1"></i> {{ field.label }}: {{ field.errors|join:", " }}
+                                        </div>
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
+                            
                             {% if form.non_field_errors %}
                                 <div class="text-danger small fw-bold mt-1">{{ form.non_field_errors }}</div>
                             {% endif %}
