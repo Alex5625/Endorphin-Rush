@@ -157,7 +157,7 @@ def home_view(request):
         }
         context['agenda'] = agenda
         
-    return render(request, 'home.html', context)
+    return render(request, 'core/home.html', context)
 @login_required
 def eliminar_rutina(request, pk):
     rutina = get_object_or_404(Rutina, pk=pk)
