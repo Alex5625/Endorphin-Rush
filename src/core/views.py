@@ -9,7 +9,6 @@ from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from core.models import HistorialAcciones
 from exercises.models import Ejercicio
-from .models import HistorialAcciones
 from exercise_plans.models import Rutina
  # Create your views here.
  
