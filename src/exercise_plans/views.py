@@ -32,12 +32,13 @@ def crear_rutina(request):
     es_coach = request.user.groups.filter(name__in=['Coach', 'Administrador']).exists() or request.user.is_staff or request.user.is_superuser
 
     if request.method == 'POST':
-        form = RutinaForm(request.POST)
+        rutina_base = Rutina(autor=request.user)
+        
+        form = RutinaForm(request.POST, instance=rutina_base)
         formset = RutinaEjercicioFormSet(request.POST)
         
         if form.is_valid() and formset.is_valid():
             rutina = form.save(commit=False)
-            rutina.autor = request.user
             
             # Si no es coach, se fuerza a que sea privada
             if not es_coach:
@@ -97,34 +98,39 @@ def editar_rutina(request, pk):
         'rutina': rutina
     }
     return render(request, 'exercise_plans/configurar_rutina.html', context)
+
 @login_required
 def guardar_rutina(request, rutina_id):
-    # Forzar a que solo se clone mediante peticiones POST por seguridad (ej. desde un botón/formulario)
     if request.method == 'POST':
-        rutina_original = get_object_or_404(Rutina, id=rutina_id)
-        
-        # Evaluamos de inmediato los ejercicios asociados antes de perder la referencia del objeto original
+        # 🛡️ FIX IDOR: Solo permitimos clonar si es pública o si le pertenece al usuario
+        rutina_original = get_object_or_404(
+            Rutina, 
+            Q(id=rutina_id) & (Q(publico=True) | Q(autor=request.user))
+        )
         mis_ejercicios_og = list(rutina_original.rutinaejercicio_set.all())
         
-        # Clonamos la rutina principal cambiando sus llaves
         rutina_original.pk = None
-        rutina_original.id = None # Seteamos ambos en None para blindar la clonación en SQLite
+        rutina_original.id = None 
         rutina_original.autor = request.user
         rutina_original.publico = False
         
-        # 🛡️ Formateo seguro para respetar el unique=True y el max_length=100
-        marca_tiempo = int(time.time()) # Inyecta un timestamp único al final
-        sufijo = f" (Copia-{marca_tiempo})" # ej: (Copia-1719284210)
+        # 🛡️ Limpiamos la agenda para que no choque con los días del usuario que clona
+        rutina_original.lunes = False
+        rutina_original.martes = False
+        rutina_original.miercoles = False
+        rutina_original.jueves = False
+        rutina_original.viernes = False
+        rutina_original.sabado = False
+        rutina_original.domingo = False
         
-        # Recortamos el nombre original a un máximo de 75 caracteres para dejar espacio al sufijo
+        marca_tiempo = int(time.time())
+        sufijo = f" (Copia-{marca_tiempo})" 
         nombre_recortado = rutina_original.nombre_rutina[:75]
         rutina_original.nombre_rutina = f"{nombre_recortado}{sufijo}"
 
-        # Guardamos la nueva rutina en la BD
         rutina_original.save()
         mi_nueva_rutina = rutina_original
 
-        # Clonamos cada uno de los ejercicios asociados al plan
         for ejercicio in mis_ejercicios_og:
             ejercicio.pk = None
             ejercicio.id = None
@@ -135,6 +141,27 @@ def guardar_rutina(request, rutina_id):
         return redirect('exercise_plans:mis_rutinas')
         
     return redirect('forum:board')
+
+# Esta es la vista que debe renderizar el home.html
+def home_view(request):
+    context = {}
+    if request.user.is_authenticated:
+        rutinas_usuario = Rutina.objects.filter(autor=request.user)
+        
+        # Estructuramos un diccionario con la rutina asignada a cada día
+        # Usamos .first() porque nuestro modelo ya garantiza que solo haya 1 por día
+        agenda = {
+            'Lunes': rutinas_usuario.filter(lunes=True).first(),
+            'Martes': rutinas_usuario.filter(martes=True).first(),
+            'Miércoles': rutinas_usuario.filter(miercoles=True).first(),
+            'Jueves': rutinas_usuario.filter(jueves=True).first(),
+            'Viernes': rutinas_usuario.filter(viernes=True).first(),
+            'Sábado': rutinas_usuario.filter(sabado=True).first(),
+            'Domingo': rutinas_usuario.filter(domingo=True).first(),
+        }
+        context['agenda'] = agenda
+        
+    return render(request, 'core/home.html', context)
 
 @login_required
 def eliminar_rutina(request, pk):

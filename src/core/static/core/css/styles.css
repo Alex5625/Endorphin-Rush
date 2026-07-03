@@ -147,3 +147,25 @@
     font-weight: bold;
     font-size:small;
 }
+
+/* Estilos para el scroll horizontal en móviles */
+.agenda-scroll-container {
+    
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+    scroll-snap-type: x mandatory; /* Efecto imán al deslizar */
+}
+
+/* Ocultar la barra de scroll para un diseño más limpio */
+.agenda-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+.agenda-scroll-container {
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
+}
+
+.tarjeta-dia {
+    scroll-snap-align: start; /* Alineación del efecto imán */
+    min-width: 260px; /* Ancho mínimo para que no se aplasten en celular */
+}

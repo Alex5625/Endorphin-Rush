@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.core.exceptions import ValidationError
 from exercises.models import Ejercicio
 # Create your models here.
 
@@ -35,20 +35,51 @@ class Rutina(models.Model):
         verbose_name="¿Es pública?"
     )
 
+    lunes = models.BooleanField(default=False, verbose_name="Lunes")
+    martes = models.BooleanField(default=False, verbose_name="Martes")
+    miercoles = models.BooleanField(default=False, verbose_name="Miércoles")
+    jueves = models.BooleanField(default=False, verbose_name="Jueves")
+    viernes = models.BooleanField(default=False, verbose_name="Viernes")
+    sabado = models.BooleanField(default=False, verbose_name="Sábado")
+    domingo = models.BooleanField(default=False, verbose_name="Domingo")
+
     class Meta:
         verbose_name = "Rutina"
         verbose_name_plural = "Rutinas"
-
-    constraints = [
+        # 🛡️ FIX CONSTRAINTS: La restricción ahora vive de forma correcta al interior de la clase Meta
+        constraints = [
             models.UniqueConstraint(
                 fields=['autor', 'nombre_rutina'], 
                 name='unique_rutina_per_user'
             )
-    ] 
-    
+        ] 
+        
+    def clean(self):
+            super().clean()
+            
+            dias_semana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']
+            
+            # 1. Creamos un diccionario vacío para ir anotando los errores sin detener el proceso
+            errores_dias = {} 
+            
+            for dia in dias_semana:
+                # Si el usuario marcó este día como True en el formulario...
+                if getattr(self, dia):
+                    rutinas_conflicto = Rutina.objects.filter(
+                        autor=self.autor, 
+                        **{dia: True}
+                    ).exclude(pk=self.pk)
+                    
+                    if rutinas_conflicto.exists():
+                        nombre_conflicto = rutinas_conflicto.first().nombre_rutina
+                        # 2. En lugar de hacer "raise", guardamos el error en nuestro diccionario
+                        errores_dias[dia] = f"Día bloqueado. Ya ocupado por tu rutina '{nombre_conflicto}'."
+
+            # 3. Al terminar de revisar los 7 días, si anotamos al menos un error, los lanzamos TODOS juntos
+            if errores_dias:
+                raise ValidationError(errores_dias)
     def __str__(self):
         return f"{self.nombre_rutina} (por {self.autor.username})"
-
 
 class RutinaEjercicio(models.Model):
     rutina = models.ForeignKey(Rutina, on_delete=models.CASCADE)
@@ -58,7 +89,6 @@ class RutinaEjercicio(models.Model):
     descanso = models.IntegerField(default=20, verbose_name="Descanso entre series (segundos)")
 
     class Meta:
-
         verbose_name = "Ejercicio de la Rutina"
         verbose_name_plural = "Ejercicios de la Rutina"
         
