@@ -98,7 +98,6 @@ def editar_rutina(request, pk):
         'rutina': rutina
     }
     return render(request, 'exercise_plans/configurar_rutina.html', context)
-# --- REEMPLAZA TU FUNCION guardar_rutina ACTUAL POR ESTA ---
 @login_required
 def guardar_rutina(request, rutina_id):
     if request.method == 'POST':
