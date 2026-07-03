@@ -54,15 +54,6 @@ class Rutina(models.Model):
     sabado = models.BooleanField(default=False, verbose_name="Sábado")
     domingo = models.BooleanField(default=False, verbose_name="Domingo")
 
-    class Meta:
-        verbose_name = "Rutina"
-        verbose_name_plural = "Rutinas"
-        constraints = [
-            models.UniqueConstraint(
-                fields=['autor', 'nombre_rutina'], 
-                name='unique_rutina_per_user'
-            )
-        ] 
         
     def clean(self):
         super().clean()
