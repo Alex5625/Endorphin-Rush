@@ -6,7 +6,13 @@
         <div class="col-md-8 mx-auto">
             <div class="card shadow">
                 <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">Crear Nueva Publicación</h4>
+                    <h4 class="mb-0">
+                        {% if publicacion %}
+                            <i class="bi bi-pencil-square me-2"></i>Editar Publicación
+                        {% else %}
+                            Crear Nueva Publicación
+                        {% endif %}
+                    </h4>
                 </div>
                 <div class="card-body">
                     
@@ -16,7 +22,13 @@
                         {{ form.as_p }}
                         
                         <div class="mt-4">
-                            <button type="submit" class="btn btn-success">Publicar en el Muro</button>
+                            <button type="submit" class="btn {% if publicacion %}btn-warning{% else %}btn-success{% endif %} fw-bold">
+                                {% if publicacion %}
+                                    Guardar Cambios
+                                {% else %}
+                                    Publicar en el Foro
+                                {% endif %}
+                            </button>
                             <a href="{% url 'forum:board' %}" class="btn btn-secondary">Cancelar</a>
                         </div>
                     </form>
