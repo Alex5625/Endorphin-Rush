@@ -59,19 +59,19 @@ def editar_publicacion(request, post_id):
         rutina_qs = Rutina.objects.filter(Q(autor=request.user) & Q(publico=True))
 
         if publicacion.rutina_vinculada_id:
-
             rutina_qs = (rutina_qs | Rutina.objects.filter(id=publicacion.rutina_vinculada_id, autor=request.user))
-
-        form.fields['rutina_vinculada'].queryset = rutina_qs.distinct()
+        form.fields['rutina_vinculada'].queryset = Rutina.objects.filter(
+            Q(autor=request.user) & Q(publico=True)
+        ).distinct()
 
         if form.is_valid():
-        rutina_qs = Rutina.objects.filter(Q(autor=request.user) & Q(publico=True))
-        if publicacion.rutina_vinculada_id:
-            rutina_qs = (rutina_qs | Rutina.objects.filter(id=publicacion.rutina_vinculada_id, autor=request.user))
-        form.fields['rutina_vinculada'].queryset = rutina_qs.distinct()
+            form.save()
+            return redirect('forum:board')
+
     else:
         form = PostForm(instance=publicacion)
-        form.fields['rutina_vinculada'].queryset = Rutina.objects.filter(
-            Q(autor=request.user) & Q(publico=True)).distinct()
-
+        rutina_qs = Rutina.objects.filter(Q(autor=request.user) & Q(publico=True))
+        if publicacion.rutina_vinculada_id:
+            rutina_qs = (rutina_qs | Rutina.objects.filter(id=publicacion.rutina_vinculada_id, autor=request.user))
+        form.fields['rutina_vinculada'].queryset = rutina_qs.distinct()
     return render(request, 'forum/create_post.html', {'form':form, 'publicacion': publicacion})
