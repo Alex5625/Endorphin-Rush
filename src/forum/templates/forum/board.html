@@ -19,11 +19,22 @@
             {% for post in publicaciones %}
             <div class="card mb-4 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title titulo-publicacion">{{post.titulo}}</h5>
-                    <h5 class="detalles-publicacion">Publicado por {{post.autor.first_name}}</h5>
-                    <h6 class="card-subtitle mb-2 detalles-publicacion">
-                        {{ post.fecha_creacion|date:"d/m/Y" }}
-                    </h6>
+                    <div class="row align-items-start">
+                        <div class="col">
+                            <h5 class="card-title titulo-publicacion">{{post.titulo}}</h5>
+                            <h5 class="detalles-publicacion">Publicado por {{post.autor.first_name}}</h5>
+                            <h6 class="card-subtitle mb-2 detalles-publicacion">
+                                {{ post.fecha_creacion|date:"d/m/Y" }}
+                            </h6>
+                        </div>
+                        <div class="col-auto">
+                            {% if post.autor == request.user %}
+                                <a href="{% url 'forum:editar_publicacion' post.id %}" class="btn boton-verde btn-sm shadow-sm fw-bold text-dark">
+                                    <i class="bi bi-pencil-square me-2"></i>Editar
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
                     <hr>
 
                     <p class="card-text"> {{ post.texto }}

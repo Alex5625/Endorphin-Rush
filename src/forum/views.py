@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Publicacion
 from .forms import PostForm
@@ -42,3 +42,29 @@ def crear_publicacion(request):
             Q(autor=request.user) & Q(publico=True)).distinct()
 
     return render(request, 'forum/create_post.html', {'form':form}) 
+
+
+@login_required
+@user_passes_test(es_entrenador_o_admin, login_url='forum:board')
+def editar_publicacion(request, post_id):
+    
+    publicacion = get_object_or_404(Publicacion, id=post_id)
+
+    if publicacion.autor != request.user:
+        return redirect('forum:board')
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=publicacion)
+        
+        form.fields['rutina_vinculada'].queryset = Rutina.objects.filter(
+            Q(autor=request.user) & Q(publico=True)).distinct()
+            
+        if form.is_valid():
+            form.save()
+            return redirect('forum:board')
+    else:
+        form = PostForm(instance=publicacion)
+        form.fields['rutina_vinculada'].queryset = Rutina.objects.filter(
+            Q(autor=request.user) & Q(publico=True)).distinct()
+
+    return render(request, 'forum/create_post.html', {'form':form, 'publicacion': publicacion})
