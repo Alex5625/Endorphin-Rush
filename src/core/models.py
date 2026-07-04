@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
 
 # Create your models here.
 
@@ -28,3 +30,34 @@ class TerminosCondiciones(models.Model):
 
     def __str__(self):
         return f"Términos actualizados el {self.fecha_actualizacion.strftime('%d/%m/%Y')}"
+    
+class SesionEntrenamiento(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.RESTRICT)
+    rutina = models.ForeignKey('exercise_plans.Rutina', on_delete=models.RESTRICT)
+    fecha_inicio = models.DateTimeField(auto_now_add=True)
+    fecha_fin = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.rutina.nombre} - {self.fecha_inicio.strftime('%d/%m %H:%M')}"
+
+    @property
+    def esta_activa(self):
+        ##devuelve True si la sesion sigue en curso y no han pasado 3 horas
+        if self.fecha_fin:
+            return False
+        
+        limite = self.fecha_inicio + timedelta(hours=3)
+        if timezone.now()>limite:
+            return False
+        
+        return True
+    def cerrar_sesion(self):
+        ##cierra la sesion actual aplicando la regla de las 3 horas si expiró
+        if not self.fecha_fin:
+            limite = self.fecha_inicio + timedelta(hours=3)
+            if timezone.now() > limite:
+                self.fecha_fin = limite
+            else: 
+                self.fecha_fin =  timezone.now()
+            self.save()
+

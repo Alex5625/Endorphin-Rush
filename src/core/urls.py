@@ -17,4 +17,7 @@ urlpatterns = [
     path('panel-control/pendientes/', views.panel_pendientes, name='panel_pendientes'),
     path('panel-control/procesar/<int:pk>/', views.procesar_ejercicio, name='procesar_ejercicio'),
 
+    # HU-24: Inicio Rápido Diario
+    path('sesion/cambiar-estado/<int:rutina_id>/', views.cambiar_estado_sesion, name='cambiar_estado_sesion'),
+
  ] 

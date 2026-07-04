@@ -5,9 +5,11 @@ from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
-from core.models import HistorialAcciones
+from core.models import HistorialAcciones, SesionEntrenamiento
 from exercises.models import Ejercicio
 from exercise_plans.models import Rutina
+from datetime import datetime
+from django.utils import timezone
 
 def home(request):
     context = {}
@@ -28,6 +30,33 @@ def home(request):
         }
         
         context['agenda'] = agenda
+
+        ##logica para hu-24: incio rapido diario
+
+        #1. saber q dia es hoy mapeado exacto a las llaves de la agenda creada
+        dias_semana =['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+        hoy_index = datetime.today().weekday()      ##0=Lunes,  6=Domingo
+        dia_actual_str = dias_semana[hoy_index]
+
+        #2. extraer la rutina de hoy directamente de la agenda
+        rutina_hoy = agenda[dia_actual_str]
+        sesion_activa = None
+
+        #3. buscar si el usuario tiene una sesion sin terminar
+        sesion_pendiente = SesionEntrenamiento.objects.filter(
+            usuario=request.user,
+            fecha_fin__isnull=True
+        ).first()
+
+        if sesion_pendiente:
+            if not sesion_pendiente.esta_activa:
+                sesion_pendiente.cerrar_sesion()        #se cierra automaticamente si pasaron 3 horas
+            else:
+                sesion_activa = sesion_pendiente    #sigue activa
+        
+        #se guarda en el context para usarlo en el html
+        context['rutina_hoy']= rutina_hoy
+        context['sesion_activa']= sesion_activa
         
     return render(request, 'core/home.html', context)
 
@@ -151,3 +180,31 @@ def procesar_ejercicio(request, pk):
             messages.warning(request, f"El ejercicio '{nombre_respaldo}' ha sido rechazado y eliminado del sistema.")
             
     return redirect('core:panel_pendientes')
+
+
+#Nueva vista para la HU-24: control del boton:)
+@login_required
+def cambiar_estado_sesion(request, rutina_id):
+    if request.method == 'POST':
+        rutina = get_object_or_404(Rutina, id=rutina_id)
+        
+        #buscamos si el usuario ya está entrenando en este momento
+        sesion_activa = SesionEntrenamiento.objects.filter(
+            usuario=request.user, 
+            fecha_fin__isnull=True
+        ).first()
+
+        if sesion_activa:
+            #si el botón se presiona y hay sesión, significa TERMINAR
+            sesion_activa.cerrar_sesion()
+            messages.success(request, f"¡Excelente trabajo! Has finalizado tu rutina de {rutina.nombre_rutina}.")
+        else:
+            #sii el botón se presiona y no hay sesión, significa INICIAR
+            SesionEntrenamiento.objects.create(
+                usuario=request.user,
+                rutina=rutina
+            )
+            messages.success(request, f"¡Sesión iniciada! A darle con todo a {rutina.nombre_rutina}.")
+            
+    #redirigimos de vuelta a tu página de inicio
+    return redirect('core:home')
