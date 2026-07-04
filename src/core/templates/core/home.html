@@ -17,6 +17,47 @@
     </div>
     
     {% if user.is_authenticated %}
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-8 col-lg-6">
+                {% if sesion_activa %}
+                    <div class="card bg-warning text-dark border-0 shadow-sm rounded-4 text-center">
+                        <div class="card-body py-4">
+                            <h4 class="fw-bold mb-2"><i class="bi bi-stopwatch me-2"></i>¡Entrenamiento en curso!</h4>
+                            <p class="mb-4">Estás realizando la rutina: <strong>{{ sesion_activa.rutina.nombre_rutina }}</strong></p>
+                            <form action="{% url 'core:cambiar_estado_sesion' sesion_activa.rutina.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-lg rounded-pill px-4 fw-bold shadow-sm">
+                                    ⏹️ Finalizar Rutina
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                {% elif rutina_hoy %}
+                    <div class="card bg-success text-white border-0 shadow-sm rounded-4 text-center">
+                        <div class="card-body py-4">
+                            <h4 class="fw-bold mb-2"><i class="bi bi-lightning-charge me-2"></i>¡Tu misión de hoy!</h4>
+                            <p class="mb-4">Te toca la rutina: <strong>{{ rutina_hoy.nombre_rutina }}</strong></p>
+                            <form action="{% url 'core:cambiar_estado_sesion' rutina_hoy.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-light text-success btn-lg rounded-pill px-4 fw-bold shadow-sm">
+                                    ▶️ Iniciar Ahora
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <div class="card bg-light text-secondary border-0 shadow-sm rounded-4 text-center">
+                        <div class="card-body py-4">
+                            <h5 class="fw-bold mb-2"><i class="bi bi-cup-hot me-2"></i>Día de descanso</h5>
+                            <p class="mb-0 small">No tienes rutinas programadas para hoy. ¡Recupera energías!</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-bold m-0"><i class="bi bi-calendar-range me-2"></i>Tu Semana</h4>
             <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn btn-outline-primary btn-sm fw-medium">
