@@ -56,13 +56,19 @@ def editar_publicacion(request, post_id):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=publicacion)
         
+        rutina_qs = Rutina.objects.filter(Q(autor=request.user) & Q(publico=True))
+
+        if publicacion.rutina_vinculada_id:
+
+            rutina_qs = (rutina_qs | Rutina.objects.filter(id=publicacion.rutina_vinculada_id, autor=request.user))
+
+        form.fields['rutina_vinculada'].queryset = rutina_qs.distinct()
+
+        if form.is_valid():
         rutina_qs = Rutina.objects.filter(Q(autor=request.user) & Q(publico=True))
         if publicacion.rutina_vinculada_id:
             rutina_qs = (rutina_qs | Rutina.objects.filter(id=publicacion.rutina_vinculada_id, autor=request.user))
         form.fields['rutina_vinculada'].queryset = rutina_qs.distinct()
-        if form.is_valid():
-            form.save()
-            return redirect('forum:board')
     else:
         form = PostForm(instance=publicacion)
         form.fields['rutina_vinculada'].queryset = Rutina.objects.filter(
