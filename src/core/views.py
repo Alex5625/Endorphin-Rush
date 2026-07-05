@@ -10,6 +10,7 @@ from exercises.models import Ejercicio
 from exercise_plans.models import Rutina
 from datetime import datetime
 from django.utils import timezone
+from .models import SesionEntrenamiento
 
 def home(request):
     context = {}
@@ -185,26 +186,47 @@ def procesar_ejercicio(request, pk):
 #Nueva vista para la HU-24: control del boton:)
 @login_required
 def cambiar_estado_sesion(request, rutina_id):
-    if request.method == 'POST':
-        rutina = get_object_or_404(Rutina, id=rutina_id)
-        
-        #buscamos si el usuario ya está entrenando en este momento
-        sesion_activa = SesionEntrenamiento.objects.filter(
-            usuario=request.user, 
-            fecha_fin__isnull=True
-        ).first()
+    rutina = get_object_or_404(Rutina, id=rutina_id)
+    
+    #1.buscamos si el usuario ya está entrenando en este momento
+    sesion_activa = SesionEntrenamiento.objects.filter(
+        usuario=request.user, 
+        fecha_fin__isnull=True
+    ).first()
 
-        if sesion_activa:
-            #si el botón se presiona y hay sesión, significa TERMINAR
-            sesion_activa.cerrar_sesion()
-            messages.success(request, f"¡Excelente trabajo! Has finalizado tu rutina de {rutina.nombre_rutina}.")
-        else:
-            #sii el botón se presiona y no hay sesión, significa INICIAR
-            SesionEntrenamiento.objects.create(
-                usuario=request.user,
-                rutina=rutina
-            )
-            messages.success(request, f"¡Sesión iniciada! A darle con todo a {rutina.nombre_rutina}.")
-            
-    #redirigimos de vuelta a tu página de inicio
-    return redirect('core:home')
+    if sesion_activa:
+        #2. si el boton se presiona y hay sesion activa, significa TERMINAR
+        sesion_activa.cerrar_sesion()
+        messages.success(request, f"¡Excelente trabajo! Has finalizado tu rutina de {rutina.nombre_rutina}.")
+        
+        #redirigidimos al inicio despues de cerrar
+        return redirect('core:home')
+ 
+    else:
+        #3. si el boton se presiona y NO HAY sesion, entonces significa INICIAR
+        nueva_sesion = SesionEntrenamiento.objects.create(
+            usuario=request.user,
+            rutina = rutina
+        )   
+        messages.success(request, f"¡Sesión iniciada! A darle con todo a {rutina.nombre_rutina}.")
+        #redirigimos al modo de ejecucion
+        return redirect('core:ejecutar_entrenamiento', sesion_id=nueva_sesion.id)
+    
+
+
+##para la ejecución del entrenamiento 
+@login_required
+def ejecutar_entrenamiento(request, sesion_id):
+    # 1. Buscamos la sesión activa en la base de datos
+    sesion = get_object_or_404(SesionEntrenamiento, id=sesion_id, usuario=request.user)
+    
+    # 2. Obtenemos la rutina asociada a esta sesión
+    rutina = sesion.rutina 
+    
+    # 3. Empaquetamos todo para enviarlo al HTML
+    context = {
+        'sesion': sesion,
+        'rutina': rutina,
+    }
+    
+    return render(request, 'core/ejecucion_entrenamiento.html', context)

@@ -20,4 +20,7 @@ urlpatterns = [
     # HU-24: Inicio Rápido Diario
     path('sesion/cambiar-estado/<int:rutina_id>/', views.cambiar_estado_sesion, name='cambiar_estado_sesion'),
 
+    #para ejecución de entrenamiento
+    path('ejecucion/<int:sesion_id>/', views.ejecutar_entrenamiento, name='ejecutar_entrenamiento'),
+
  ] 
