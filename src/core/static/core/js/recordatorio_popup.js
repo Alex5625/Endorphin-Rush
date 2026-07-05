@@ -35,7 +35,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            const [horaRutina, minRutina] = rutinaDeHoy.hora.split(':').map(Number);
+            // 🛡️ FIX VALIDACIÓN JS: Aseguramos que la hora no sea undefined y sea válida numéricamente
+            const [horaRutina, minRutina] = String(rutinaDeHoy.hora || '').split(':').map(Number);
+            
+            if (!Number.isFinite(horaRutina) || !Number.isFinite(minRutina)) {
+                console.warn('Hora de recordatorio inválida:', rutinaDeHoy.hora);
+                return;
+            }
+
             const momentoAlerta = new Date();
             momentoAlerta.setHours(horaRutina, minRutina, 0, 0);
 

@@ -29,7 +29,6 @@ class Rutina(models.Model):
         blank=True,
     )
 
-
     publico = models.BooleanField(
         default=False,
         verbose_name="¿Es pública?"
@@ -42,7 +41,6 @@ class Rutina(models.Model):
     viernes = models.BooleanField(default=False, verbose_name="Viernes")
     sabado = models.BooleanField(default=False, verbose_name="Sábado")
     domingo = models.BooleanField(default=False, verbose_name="Domingo")
-
 
     recordatorio_correo = models.BooleanField(
         default=False, 
@@ -80,8 +78,8 @@ class Rutina(models.Model):
         
         dias_semana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']
         
-        # 1. Creamos un diccionario vacío para ir anotando los errores sin detener el proceso
-        errores_dias = {} 
+        # 1. Diccionario unificado para TODOS los errores del modelo
+        errores = {} 
         
         for dia in dias_semana:
             # Si el usuario marcó este día como True en el formulario...
@@ -93,22 +91,19 @@ class Rutina(models.Model):
                 
                 if rutinas_conflicto.exists():
                     nombre_conflicto = rutinas_conflicto.first().nombre_rutina
-                    # 2. En lugar de hacer "raise", guardamos el error en nuestro diccionario
-                    errores_dias[dia] = f"Día bloqueado. Ya ocupado por tu rutina '{nombre_conflicto}'."
+                    errores[dia] = f"Día bloqueado. Ya ocupado por tu rutina '{nombre_conflicto}'."
 
-        # 3. Al terminar de revisar los 7 días, si anotamos al menos un error, los lanzamos TODOS juntos
-        if errores_dias:
-            raise ValidationError(errores_dias)
-        
-        errores_recordatorio = {}
+        # 2. Validación de recordatorios en el mismo diccionario
         if self.recordatorio_correo and not self.hora_correo:
-            errores_recordatorio['hora_correo'] = "Debes especificar la hora para el correo."
+            errores['hora_correo'] = "Debes especificar la hora para el correo."
             
         if self.recordatorio_popup and not self.hora_popup:
-            errores_recordatorio['hora_popup'] = "Debes especificar la hora para la notificación en pantalla."
+            errores['hora_popup'] = "Debes especificar la hora para la notificación en pantalla."
             
-        if errores_recordatorio:
-            raise ValidationError(errores_recordatorio)
+        # 3. Lanzamos un solo ValidationError con todos los problemas detectados
+        if errores:
+            raise ValidationError(errores)
+            
     def __str__(self):
         return f"{self.nombre_rutina} (por {self.autor.username})"
 
