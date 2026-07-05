@@ -84,44 +84,40 @@
                                                     <!-- Correo -->
                                                     <div class="col-md-6">
                                                         <div class="card h-100 border-0 bg-light rounded-4 p-3">
-                                                            <div class="form-check form-switch mb-2">
+                                                            <div class="form-check form-switch mb-3">
                                                                 {{ form.recordatorio_correo }}
-                                                                <label class="form-check-label fw-bold">Email</label>
+                                                                <label class="form-check-label fw-bold ms-1">Email</label>
                                                             </div>
-                                                            <div class="input-group input-group-sm">
-                                                                <div class="row g-1">
-                                                                    <div class="col-4">
-                                                                        {{ form.hora_c_sel }}
-                                                                    </div>
-                                                                    <div class="col-4">
-                                                                        {{ form.min_c_sel }}
-                                                                    </div>
-                                                                    <div class="col-4">
-                                                                        {{ form.ampm_c_sel }}
-                                                                    </div>
-                                                                </div>
+                                                            
+                                                            <!-- Usamos d-flex y gap-2 en lugar de row/col para evitar que se aplasten -->
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                {{ form.hora_c_sel }}
+                                                                
+                                                                <!-- Separador visual estético -->
+                                                                <span class="text-muted fw-bold pb-1">:</span>
+                                                                
+                                                                {{ form.min_c_sel }}
+                                                                {{ form.ampm_c_sel }}
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <!-- Pop-up -->
                                                     <div class="col-md-6">
                                                         <div class="card h-100 border-0 bg-light rounded-4 p-3">
-                                                            <div class="form-check form-switch mb-2">
+                                                            <div class="form-check form-switch mb-3">
                                                                 {{ form.recordatorio_popup }}
-                                                                <label class="form-check-label fw-bold">Notificación Web</label>
+                                                                <label class="form-check-label fw-bold ms-1">Pop-up</label>
                                                             </div>
-                                                            <div class="input-group input-group-sm">
-                                                                <div class="row g-1">
-                                                                    <div class="col-4">
-                                                                        {{ form.hora_c_sel }}
-                                                                    </div>
-                                                                    <div class="col-4">
-                                                                        {{ form.min_c_sel }}
-                                                                    </div>
-                                                                    <div class="col-4">
-                                                                        {{ form.ampm_c_sel }}
-                                                                    </div>
-                                                                </div>                                                            
+                                                            
+                                                            <!-- Usamos d-flex y gap-2 en lugar de row/col para evitar que se aplasten -->
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                {{ form.hora_p_sel }}
+                                                                
+                                                                <!-- Separador visual estético -->
+                                                                <span class="text-muted fw-bold pb-1">:</span>
+                                                                
+                                                                {{ form.min_p_sel }}
+                                                                {{ form.ampm_p_sel }}
                                                             </div>
                                                         </div>
                                                     </div>

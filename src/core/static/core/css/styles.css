@@ -172,15 +172,17 @@
 
 /* Suavizado de selector de hora para notificaciones */
 
-.form-select-sm {
+/* .form-select-sm {
     padding: 0.25rem 0.5rem;
+    width: 100%;
     font-size: 0.875rem;
-    border: 1px solid #dee2e6; /* Borde más sutil */
+    border: 1px solid #dee2e6; 
     background-color: #ffffff;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
+} 
 
 .form-select-sm:focus {
+    width: 100%;
     border-color: #86b7fe;
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
-}
+} */

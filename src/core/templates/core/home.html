@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load webpush_notifications %}
+{% load static %}
 {% block title %}Inicio - Endorphin-Rush{% endblock %}
 
 {% block content %}
@@ -62,13 +62,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-bold m-0"><i class="bi bi-calendar-range me-2"></i>Tu Semana</h4>
-                <div>
-                    <i class="bi bi-bell-fill text-warning me-2"></i>
-                    <strong>Activa las notificaciones</strong> para avisarte cuando sea hora de entrenar.
-                </div>
-                
-                {% webpush_button with_class="btn btn-primary btn-sm fw-bold shadow-sm rounded-pill px-3" %}
-            
+
             <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn btn-primary btn-sm fw-bold shadow-sm rounded-pill px-3">
                 Gestionar
             </a>
@@ -114,10 +108,45 @@
                 {% endfor %}
             </div>
         </div>
-        
+        {% comment %} Modal de Recordatorio {% endcomment %}
         <div class="text-center mt-2 d-md-none">
             <small class="text-muted"><i class="bi bi-arrows-left-right me-1"></i>Desliza para ver más</small>
         </div>
+        <div class="modal fade" id="modalRecordatorio" tabindex="-1" aria-labelledby="modalRecordatorioLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow rounded-4">
+                    <div class="modal-header bg-warning text-dark rounded-top-4 py-3">
+                        <h5 class="modal-title fw-bold" id="modalRecordatorioLabel">
+                            <i class="bi bi-bell-fill me-2"></i> ¡Hora de Entrenar!
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-center">
+                        <p class="fs-5">Tienes una rutina programada para hoy:</p>
+                        <h3 class="text-primary fw-bold mb-3" id="lbl-nombre-rutina">--</h3>
+                        <p class="text-muted small" id="lbl-desc-rutina">--</p>
+                    </div>
+                    {% comment %} <div class="modal-content p-3 border-0 bg-light rounded-bottom-4 d-flex flex-row justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Luego</button>
+                        <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn btn-success btn-sm px-4 fw-medium">Ver Detalles</a>
+                    </div> {% endcomment %}
+                </div>
+            </div>
+        </div>
+
+        <script id="agenda-data-json" type="application/json">
+        {
+            {% for dia, rutina in agenda.items %}
+                "{{ dia }}": {
+                    "nombre": "{{ rutina.nombre_rutina|escapejs }}",
+                    "descripcion": "{{ rutina.descripcion_rutina|escapejs }}",
+                    "usa_popup": {% if rutina.recordatorio_popup %}true{% else %}false{% endif %},
+                    "hora": "{{ rutina.hora_popup|time:'H:i' }}"
+                }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        }
+        </script>
+        <script src="{% static 'core/js/recordatorio_popup.js' %}"></script>
 
     {% else %}
         <div class="text-center mt-5">
@@ -125,6 +154,7 @@
             <span class="text-muted mx-2">o</span>
             <a href="{% url 'authentication:registro' %}" class="btn btn-outline-dark px-4 py-2 shadow-sm rounded-pill">Crea una cuenta</a>
         </div>
-    {% endif %}
+        {% endif %}
 </div>
+
 {% endblock %}
