@@ -43,27 +43,6 @@ class Rutina(models.Model):
     sabado = models.BooleanField(default=False, verbose_name="Sábado")
     domingo = models.BooleanField(default=False, verbose_name="Domingo")
 
-
-    recordatorio_correo = models.BooleanField(
-        default=False, 
-        verbose_name="Enviar recordatorio por correo"
-    )
-    hora_correo = models.TimeField(
-        null=True, 
-        blank=True, 
-        verbose_name="Hora del correo"
-    )
-    
-    recordatorio_popup = models.BooleanField(
-        default=False, 
-        verbose_name="Mostrar Pop-up en Inicio"
-    )
-    hora_popup = models.TimeField(
-        null=True, 
-        blank=True, 
-        verbose_name="Hora del Pop-up"
-    )
-    
     class Meta:
         verbose_name = "Rutina"
         verbose_name_plural = "Rutinas"
@@ -76,39 +55,29 @@ class Rutina(models.Model):
         ] 
         
     def clean(self):
-        super().clean()
-        
-        dias_semana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']
-        
-        # 1. Creamos un diccionario vacío para ir anotando los errores sin detener el proceso
-        errores_dias = {} 
-        
-        for dia in dias_semana:
-            # Si el usuario marcó este día como True en el formulario...
-            if getattr(self, dia):
-                rutinas_conflicto = Rutina.objects.filter(
-                    autor=self.autor, 
-                    **{dia: True}
-                ).exclude(pk=self.pk)
-                
-                if rutinas_conflicto.exists():
-                    nombre_conflicto = rutinas_conflicto.first().nombre_rutina
-                    # 2. En lugar de hacer "raise", guardamos el error en nuestro diccionario
-                    errores_dias[dia] = f"Día bloqueado. Ya ocupado por tu rutina '{nombre_conflicto}'."
+            super().clean()
+            
+            dias_semana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']
+            
+            # 1. Creamos un diccionario vacío para ir anotando los errores sin detener el proceso
+            errores_dias = {} 
+            
+            for dia in dias_semana:
+                # Si el usuario marcó este día como True en el formulario...
+                if getattr(self, dia):
+                    rutinas_conflicto = Rutina.objects.filter(
+                        autor=self.autor, 
+                        **{dia: True}
+                    ).exclude(pk=self.pk)
+                    
+                    if rutinas_conflicto.exists():
+                        nombre_conflicto = rutinas_conflicto.first().nombre_rutina
+                        # 2. En lugar de hacer "raise", guardamos el error en nuestro diccionario
+                        errores_dias[dia] = f"Día bloqueado. Ya ocupado por tu rutina '{nombre_conflicto}'."
 
-        # 3. Al terminar de revisar los 7 días, si anotamos al menos un error, los lanzamos TODOS juntos
-        if errores_dias:
-            raise ValidationError(errores_dias)
-        
-        errores_recordatorio = {}
-        if self.recordatorio_correo and not self.hora_correo:
-            errores_recordatorio['hora_correo'] = "Debes especificar la hora para el correo."
-            
-        if self.recordatorio_popup and not self.hora_popup:
-            errores_recordatorio['hora_popup'] = "Debes especificar la hora para la notificación en pantalla."
-            
-        if errores_recordatorio:
-            raise ValidationError(errores_recordatorio)
+            # 3. Al terminar de revisar los 7 días, si anotamos al menos un error, los lanzamos TODOS juntos
+            if errores_dias:
+                raise ValidationError(errores_dias)
     def __str__(self):
         return f"{self.nombre_rutina} (por {self.autor.username})"
 
