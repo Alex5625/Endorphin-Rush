@@ -68,7 +68,7 @@ def editar_rutina(request, pk):
     
     # Control de autoría estricto
     if rutina.autor != request.user:
-        return redirect('exercise_plans:lista_rutinas')
+        return redirect('exercise_plans:mis_rutinas')
 
     es_coach = request.user.groups.filter(name__in=['Coach', 'Administrador']).exists() or request.user.is_staff or request.user.is_superuser
 
@@ -85,6 +85,10 @@ def editar_rutina(request, pk):
             formset.save() 
                 
             return redirect('exercise_plans:mis_rutinas')
+        #Control de errores
+        else:
+            print("Errores en el formulario:", form.errors)
+            print("Errores en el formset:", formset.errors)
     else:
         form = RutinaForm(instance=rutina)
         formset = RutinaEjercicioFormSet(instance=rutina)
@@ -170,10 +174,10 @@ def eliminar_rutina(request, pk):
     # Control de seguridad: Impedir que un usuario elimine rutinas ajenas por URL directa
     if rutina.autor != request.user:
         messages.error(request, "No tienes permisos para eliminar esta rutina.")
-        return redirect('exercise_plans:lista_rutinas')
+        return redirect('exercise_plans:mis_rutinas')
         
     titulo = rutina.nombre_rutina
     rutina.delete()
     
     messages.success(request, f"La rutina '{titulo}' ha sido eliminada exitosamente.")
-    return redirect('exercise_plans:lista_rutinas')
+    return redirect('exercise_plans:mis_rutinas')
