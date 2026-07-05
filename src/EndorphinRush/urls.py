@@ -23,14 +23,13 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-
-
     path('', include('core.urls')),
     path('authentication/', include('authentication.urls')),
     path('exercise_types/', include('exercise_types.urls')),
     path('exercises/', include('exercises.urls')),
     path('exercise_plans/', include('exercise_plans.urls')),
     path('forum/', include('forum.urls')),
+    path('webpush/', include('webpush.urls')),
 ]
 
 if settings.DEBUG:
