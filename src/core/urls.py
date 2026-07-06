@@ -23,4 +23,6 @@ urlpatterns = [
     #para ejecución de entrenamiento
     path('ejecucion/<int:sesion_id>/', views.ejecutar_entrenamiento, name='ejecutar_entrenamiento'),
 
+    path('sesion/<int:sesion_id>/guardar-peso/<int:bloque_id>/', views.guardar_peso, name='guardar_peso'),
+
  ] 
