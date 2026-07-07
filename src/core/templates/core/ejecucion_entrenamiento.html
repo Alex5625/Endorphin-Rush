@@ -32,14 +32,14 @@
     <div class="row">
         <div class="col-12">
             
-            {% for bloque in rutina.rutinaejercicio_set.all %} 
-            <div class="card mb-4 shadow-sm border-secondary overflow-hidden">
+            {% for item in bloques_con_series %} 
+            <div class="card mb-4 shadow-sm border-secondary overflow-hidden" id="bloque-{{ item.bloque.id }}">
                 <div class="card-body p-0">
                     <div class="row g-0">
                         
                         <div class="col-md-4 bg-light d-flex align-items-center justify-content-center p-3 border-end">
-                            {% if bloque.ejercicio.imagen %}
-                                <img src="{{ bloque.ejercicio.imagen.url }}" alt="{{ bloque.ejercicio.nombre_ejercicio }}" class="img-fluid rounded shadow-sm" style="max-height: 200px; object-fit: cover;">
+                            {% if item.bloque.ejercicio.imagen %}
+                                <img src="{{ item.bloque.ejercicio.imagen.url }}" alt="{{ item.bloque.ejercicio.nombre_ejercicio }}" class="img-fluid rounded shadow-sm" style="max-height: 200px; object-fit: cover;">
                             {% else %}
                                 <div class="text-center text-muted py-5">
                                     <i class="fas fa-image fa-4x mb-2"></i>
@@ -51,26 +51,53 @@
                         <div class="col-md-8 p-4 d-flex flex-column justify-content-between">
                             <div>
                                 <h4 class="font-weight-bold text-uppercase text-dark mb-2">
-                                    {{ bloque.ejercicio.nombre_ejercicio }}
+                                    {{ item.bloque.ejercicio.nombre_ejercicio }}
                                 </h4>
                                 
                                 <p class="text-muted mb-4" style="font-size: 0.95rem;">
-                                    {{ bloque.ejercicio.descripcion_ejercicio }}
+                                    {{ item.bloque.ejercicio.descripcion_ejercicio }}
                                 </p>
 
                                 <div class="mb-4">
                                     <span class="badge bg-primary text-white p-2 me-2 mb-2" style="font-size: 0.9rem;">
-                                        <i class="fas fa-layer-group"></i> {{ bloque.series }} Series
+                                        <i class="fas fa-layer-group"></i> {{ item.bloque.series }} Series
                                     </span>
                                     <span class="badge bg-secondary text-white p-2 mb-2" style="font-size: 0.9rem;">
-                                        <i class="fas fa-hourglass-half"></i> {{ bloque.descanso }}s Descanso
+                                        <i class="fas fa-hourglass-half"></i> {{ item.bloque.descanso }}s Descanso
                                     </span>
                                 </div>
                             </div>
                             
-                            <div class="alert alert-light border border-secondary text-center mb-0 mt-auto">
-                                <i class="fas fa-plus-circle fa-2x text-secondary mb-2"></i><br>
-                                <strong>Pesos:</strong> Registro de cargas para tus {{ bloque.series }} series.
+                            <div class="border rounded p-3 mt-3 bg-light">
+                                <form method="POST" action="{% url 'core:guardar_peso' sesion.id item.bloque.id %}">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        
+                                        {% for serie in item.series_data %}
+                                        <div class="col-6 col-md-4 col-lg-3 mb-3">
+                                            <label class="small font-weight-bold text-secondary mb-1">Serie {{ serie.numero }}</label>
+                                            <div class="input-group input-group-sm shadow-sm">
+                                                <input type="number" 
+                                                       step="1" 
+                                                       class="form-control text-center font-weight-bold {% if serie.peso %}bg-light text-muted{% endif %}" 
+                                                       name="peso_serie_{{ serie.numero }}" 
+                                                       value="{{ serie.peso }}" 
+                                                       placeholder="0.0"
+                                                       {% if serie.peso %}readonly{% endif %}>
+                                                
+                                                <span class="input-group-text bg-white text-secondary font-weight-bold">kg</span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                        
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <button type="submit" class="btn btn-primary btn-sm font-weight-bold shadow-sm">
+                                            <i class="fas fa-save mr-1"></i> Guardar Pesos
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
 
                         </div>

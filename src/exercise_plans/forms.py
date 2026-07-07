@@ -1,5 +1,6 @@
 from django import forms
 from .models import Rutina, RutinaEjercicio
+from datetime import time
 
 class RutinaForm(forms.ModelForm):
     
@@ -43,20 +44,24 @@ class RutinaForm(forms.ModelForm):
         model = Rutina
         fields = [
             'nombre_rutina', 'descripcion_rutina', 'publico',
-            'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'
+            'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo', 
+            'recordatorio_correo', 'recordatorio_popup'
         ]
         widgets = {
             'nombre_rutina': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Rutina de Pecho'}),
             'descripcion_rutina': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción de la rutina...', 'rows': 4}),
-            'lunes': forms.CheckboxInput(attrs={'class': 'btn-check', 'autocomplete': 'off'}),
-            'martes': forms.CheckboxInput(attrs={'class': 'btn-check', 'autocomplete': 'off'}),
-            'miercoles': forms.CheckboxInput(attrs={'class': 'btn-check', 'autocomplete': 'off'}),
-            'jueves': forms.CheckboxInput(attrs={'class': 'btn-check', 'autocomplete': 'off'}),
-            'viernes': forms.CheckboxInput(attrs={'class': 'btn-check', 'autocomplete': 'off'}),
-            'sabado': forms.CheckboxInput(attrs={'class': 'btn-check', 'autocomplete': 'off'}),
-            'domingo': forms.CheckboxInput(attrs={'class': 'btn-check', 'autocomplete': 'off'}),
+            # Agregada la clase 'dia-checkbox' a los días
+            'lunes': forms.CheckboxInput(attrs={'class': 'btn-check dia-checkbox', 'autocomplete': 'off'}),
+            'martes': forms.CheckboxInput(attrs={'class': 'btn-check dia-checkbox', 'autocomplete': 'off'}),
+            'miercoles': forms.CheckboxInput(attrs={'class': 'btn-check dia-checkbox', 'autocomplete': 'off'}),
+            'jueves': forms.CheckboxInput(attrs={'class': 'btn-check dia-checkbox', 'autocomplete': 'off'}),
+            'viernes': forms.CheckboxInput(attrs={'class': 'btn-check dia-checkbox', 'autocomplete': 'off'}),
+            'sabado': forms.CheckboxInput(attrs={'class': 'btn-check dia-checkbox', 'autocomplete': 'off'}),
+            'domingo': forms.CheckboxInput(attrs={'class': 'btn-check dia-checkbox', 'autocomplete': 'off'}),
+            'recordatorio_correo': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
+            'recordatorio_popup': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
         }
-        
+
     def clean(self):
         cleaned_data = super().clean()
         # Obtenemos los selectores desde self.data y los booleanos desde cleaned_data
@@ -95,14 +100,10 @@ class RutinaForm(forms.ModelForm):
         return cleaned_data
 
 RutinaEjercicioFormSet = forms.inlineformset_factory(
-    Rutina, 
-    RutinaEjercicio, 
-    fields=['ejercicio', 'series', 'descanso'], 
-    extra=1,
-    can_delete=True,
+    Rutina, RutinaEjercicio, fields=['ejercicio', 'series', 'descanso'], extra=1, can_delete=True,
     widgets={
         'ejercicio': forms.Select(attrs={'class': 'form-select form-select-sm'}),
         'series': forms.NumberInput(attrs={'class': 'form-control form-select-sm', 'min': 1}),
-        'descanso': forms.NumberInput(attrs={'class': 'form-control form-select-sm', 'min': 0, 'placeholder': 'Segundos (ej: 60)'}),
+        'descanso': forms.NumberInput(attrs={'class': 'form-control form-select-sm', 'min': 0, 'placeholder': 'Segundos'}),
     }
 )

@@ -66,6 +66,72 @@
                                 <div class="text-danger small fw-bold mt-1">{{ form.non_field_errors }}</div>
                             {% endif %}
                         </div>
+                        <!-- 🔔 NUEVA SECCIÓN: CONFIGURACIÓN DE RECORDATORIOS -->
+                        <div class="col-md-12 mt-4">
+                            <div class="accordion shadow-sm" id="accordionRecordatorios">
+                                <div class="accordion-item border-0 rounded-3">
+                                    <h2 class="accordion-header" id="headingRecordatorio">
+                                        <button class="accordion-button collapsed fw-bold rounded-3 bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRecordatorio" aria-expanded="false" aria-controls="collapseRecordatorio">
+                                            <i class="bi bi-bell-fill text-warning me-2"></i> Configurar Recordatorios (Opcional)
+                                        </button>
+                                    </h2>
+                                    <div id="collapseRecordatorio" class="accordion-collapse collapse" aria-labelledby="headingRecordatorio" data-bs-parent="#accordionRecordatorios">
+                                        <div class="accordion-body bg-white border border-top-0 rounded-bottom-3">
+                                            <p class="text-muted small mb-3">Programa alertas. Aparecerán solo si seleccionas días de entrenamiento arriba.</p>
+                                            
+                                            <div id="seccion-recordatorios" style="display: none;">
+                                                <div class="row g-3">
+                                                    <!-- Correo -->
+                                                    <div class="col-md-6">
+                                                        <div class="card h-100 border-0 bg-light rounded-4 p-3">
+                                                            <div class="form-check form-switch mb-2">
+                                                                {{ form.recordatorio_correo }}
+                                                                <label class="form-check-label fw-bold">Email</label>
+                                                            </div>
+                                                            <div class="input-group input-group-sm">
+                                                                <div class="row g-1">
+                                                                    <div class="col-4">
+                                                                        {{ form.hora_c_sel }}
+                                                                    </div>
+                                                                    <div class="col-4">
+                                                                        {{ form.min_c_sel }}
+                                                                    </div>
+                                                                    <div class="col-4">
+                                                                        {{ form.ampm_c_sel }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Pop-up -->
+                                                    <div class="col-md-6">
+                                                        <div class="card h-100 border-0 bg-light rounded-4 p-3">
+                                                            <div class="form-check form-switch mb-2">
+                                                                {{ form.recordatorio_popup }}
+                                                                <label class="form-check-label fw-bold">Notificación Web</label>
+                                                            </div>
+                                                            <div class="input-group input-group-sm">
+                                                                <div class="row g-1">
+                                                                    <div class="col-4">
+                                                                        {{ form.hora_c_sel }}
+                                                                    </div>
+                                                                    <div class="col-4">
+                                                                        {{ form.min_c_sel }}
+                                                                    </div>
+                                                                    <div class="col-4">
+                                                                        {{ form.ampm_c_sel }}
+                                                                    </div>
+                                                                </div>                                                            
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -172,6 +238,22 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.dia-checkbox');
+        const seccion = document.getElementById('seccion-recordatorios');
+
+        function toggle() {
+            const activo = Array.from(checkboxes).some(cb => cb.checked);
+            seccion.style.display = activo ? 'block' : 'none';
+        }
+
+        checkboxes.forEach(cb => cb.addEventListener('change', toggle));
+        toggle(); // Estado inicial
+    });
+</script>
+
 {% endblock %}
 
 {% block extra_js %}

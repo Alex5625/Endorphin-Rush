@@ -61,3 +61,20 @@ class SesionEntrenamiento(models.Model):
                 self.fecha_fin =  timezone.now()
             self.save()
 
+class RegistroSerie(models.Model):
+    #usamos RESTRICT para evitar el borrado en cascada y proteger el historial
+    sesion = models.ForeignKey('core.SesionEntrenamiento', on_delete=models.RESTRICT)
+    bloque = models.ForeignKey('exercise_plans.RutinaEjercicio', on_delete=models.RESTRICT)
+    
+    numero_serie = models.PositiveIntegerField(verbose_name="Número de Serie")
+    peso_levantado = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        null=True, 
+        blank=True,
+        verbose_name="Peso (kg)"
+    )
+
+    def __str__(self):
+        return f"Sesión {self.sesion.id} - Serie {self.numero_serie}: {self.peso_levantado}kg"
+

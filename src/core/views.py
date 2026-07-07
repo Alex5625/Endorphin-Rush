@@ -10,7 +10,7 @@ from exercises.models import Ejercicio
 from exercise_plans.models import Rutina
 from datetime import datetime
 from django.utils import timezone
-from .models import SesionEntrenamiento
+from .models import SesionEntrenamiento, RegistroSerie
 
 def home(request):
     context = {}
@@ -218,15 +218,59 @@ def cambiar_estado_sesion(request, rutina_id):
 @login_required
 def ejecutar_entrenamiento(request, sesion_id):
     # 1. Buscamos la sesión activa en la base de datos
-    sesion = get_object_or_404(SesionEntrenamiento, id=sesion_id, usuario=request.user)
+    sesion = get_object_or_404(SesionEntrenamiento, id=sesion_id)
     
     # 2. Obtenemos la rutina asociada a esta sesión
     rutina = sesion.rutina 
-    
-    # 3. Empaquetamos todo para enviarlo al HTML
-    context = {
+
+    # Armamos una lista dinámica con los bloques y sus pesos guardados
+    bloques_con_series = []
+    for bloque in rutina.rutinaejercicio_set.all():
+        series_data = []
+        for i in range(1, bloque.series + 1):
+            # Buscamos si ya existe un peso guardado en la base de datos
+            registro = RegistroSerie.objects.filter(sesion=sesion, bloque=bloque, numero_serie=i).first()
+            
+            #se fuerza el punto decimal
+            if registro and registro.peso_levantado is not None:
+                peso = str(registro.peso_levantado).replace(',', '.')
+            else:
+                peso = ""
+            
+            series_data.append({'numero': i, 'peso': peso})
+        
+        bloques_con_series.append({
+            'bloque': bloque,
+            'series_data': series_data
+        })
+
+    return render(request, 'core/ejecucion_entrenamiento.html', {
         'sesion': sesion,
         'rutina': rutina,
-    }
-    
-    return render(request, 'core/ejecucion_entrenamiento.html', context)
+        'bloques_con_series': bloques_con_series 
+    })
+
+
+@login_required
+def guardar_peso(request, sesion_id, bloque_id):
+    if request.method == 'POST':
+        from exercise_plans.models import RutinaEjercicio
+        
+        sesion = get_object_or_404(SesionEntrenamiento, id=sesion_id)
+        bloque = get_object_or_404(RutinaEjercicio, id=bloque_id)
+        
+        # Recorremos el número de series para atrapar cada caja de texto
+        for i in range(1, bloque.series + 1):
+            peso_str = request.POST.get(f'peso_serie_{i}')
+            if peso_str: # Solo guardamos si el usuario de verdad escribió algo
+                RegistroSerie.objects.update_or_create(
+                    sesion=sesion,
+                    bloque=bloque,
+                    numero_serie=i,
+                    defaults={'peso_levantado': float(peso_str)}
+                )
+        
+        #redireccionamos de vuelta a la misma pantalla para que siga entrenando
+        return redirect('core:ejecutar_entrenamiento', sesion_id=sesion.id)
+        
+    return redirect('core:home')    
