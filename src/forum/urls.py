@@ -8,4 +8,5 @@ urlpatterns = [
     
     path('crear/', views.crear_publicacion, name='create_post'),
     path('editar/<int:post_id>/', views.editar_publicacion, name='editar_publicacion'),
+    path('eliminar/<int:post_id>/', views.eliminar_publicacion, name='eliminar_publicacion')
 ]
