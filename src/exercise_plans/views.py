@@ -2,8 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from .forms import RutinaForm, RutinaEjercicioFormSet
 from .models import Rutina
+import json
 import time
 
 @login_required
@@ -76,6 +79,8 @@ def editar_rutina(request, pk):
         form = RutinaForm(request.POST, instance=rutina)
         formset = RutinaEjercicioFormSet(request.POST, instance=rutina)
         
+        # print("🔍 DATOS QUE ENVIÓ EL NAVEGADOR:", request.POST)
+        
         if form.is_valid() and formset.is_valid():
             rutina_editada = form.save(commit=False)
             if not es_coach:
@@ -85,6 +90,13 @@ def editar_rutina(request, pk):
             formset.save() 
                 
             return redirect('exercise_plans:mis_rutinas')
+        # else:
+            
+        #     print("\n" + "="*40)
+        #     print("❌ ERRORES DEL FORMULARIO:", form.errors)
+        #     print("❌ ERRORES NON-FIELD:", form.non_field_errors())
+        #     print("❌ ERRORES DEL FORMSET:", formset.errors)
+        #     print("="*40 + "\n")
     else:
         form = RutinaForm(instance=rutina)
         formset = RutinaEjercicioFormSet(instance=rutina)
@@ -142,26 +154,6 @@ def guardar_rutina(request, rutina_id):
         
     return redirect('forum:board')
 
-# Esta es la vista que debe renderizar el home.html
-def home_view(request):
-    context = {}
-    if request.user.is_authenticated:
-        rutinas_usuario = Rutina.objects.filter(autor=request.user)
-        
-        # Estructuramos un diccionario con la rutina asignada a cada día
-        # Usamos .first() porque nuestro modelo ya garantiza que solo haya 1 por día
-        agenda = {
-            'Lunes': rutinas_usuario.filter(lunes=True).first(),
-            'Martes': rutinas_usuario.filter(martes=True).first(),
-            'Miércoles': rutinas_usuario.filter(miercoles=True).first(),
-            'Jueves': rutinas_usuario.filter(jueves=True).first(),
-            'Viernes': rutinas_usuario.filter(viernes=True).first(),
-            'Sábado': rutinas_usuario.filter(sabado=True).first(),
-            'Domingo': rutinas_usuario.filter(domingo=True).first(),
-        }
-        context['agenda'] = agenda
-        
-    return render(request, 'core/home.html', context)
 
 @login_required
 def eliminar_rutina(request, pk):
@@ -177,3 +169,43 @@ def eliminar_rutina(request, pk):
     
     messages.success(request, f"La rutina '{titulo}' ha sido eliminada exitosamente.")
     return redirect('exercise_plans:lista_rutinas')
+
+@require_POST
+def eliminar_recordatorios_ajax(request, rutina_id):
+    # print(f"🚀 ¡AJAX llegó a la vista! Intentando modificar rutina ID: {rutina_id}")
+    # print(f"👤 Usuario actual: {request.user.username} (ID: {request.user.id})")
+    
+    # Buscamos la rutina SIN el filtro de autor para ver si existe
+    rutina_existe = Rutina.objects.filter(id=rutina_id).first()
+    
+    if not rutina_existe:
+        print("❌ La rutina no existe en la base de datos.")
+        return JsonResponse({'status': 'error', 'mensaje': 'La rutina no existe.'}, status=404)
+        
+    # print(f"📝 Autor de la rutina: {rutina_existe.autor.username} (ID: {rutina_existe.autor.id})")
+    
+    # Aquí es donde fallaba tu código original
+    if rutina_existe.autor != request.user:
+        print("⛔ ERROR: El usuario actual NO es el dueño de esta rutina.")
+        return JsonResponse({'status': 'error', 'mensaje': 'No tienes permiso para modificar esta rutina.'}, status=403)
+
+    # Si pasamos las validaciones, procedemos a borrar
+    try:
+        data = json.loads(request.body)
+        tipo = data.get('tipo')
+        # print(f"✅ Permiso concedido. Eliminando tipo: {tipo}")
+
+        if tipo in ['correo', 'ambos']:
+            rutina_existe.recordatorio_correo = False
+            rutina_existe.hora_correo = None
+            
+        if tipo in ['popup', 'ambos']:
+            rutina_existe.recordatorio_popup = False
+            rutina_existe.hora_popup = None
+
+        rutina_existe.save()
+        return JsonResponse({'status': 'success', 'mensaje': 'Recordatorios actualizados.'})
+    
+    except Exception as e:
+        print(f"💥 Error en el proceso: {str(e)}")
+        return JsonResponse({'status': 'error', 'mensaje': str(e)}, status=400)

@@ -59,7 +59,30 @@ def home(request):
         context['rutina_hoy']= rutina_hoy
         context['sesion_activa']= sesion_activa
         
-    return render(request, 'core/home.html', context)
+        #principio de popup de notificaciones
+        agenda_dict = {}
+        for dia, rutina in agenda.items():
+            if rutina:
+                hora_str = rutina.hora_popup.strftime('%H:%M') if rutina.hora_popup else None
+                agenda_dict[dia] = {
+                    'nombre': rutina.nombre_rutina,
+                    'descripcion': rutina.descripcion_rutina,
+                    'usa_popup': rutina.recordatorio_popup,
+                    'hora': hora_str
+                }
+            else:
+                agenda_dict[dia] = None
+        
+        # Lo metemos al contexto junto a lo que ya tenías
+        context['agenda_dict'] = agenda_dict
+        
+        # EL PRINT DE LA VERDAD
+        print("\n" + "="*40)
+        print("📦 DICCIONARIO PARA JS CREADO CORRECTAMENTE EN HOME:")
+        print(agenda_dict.get('Martes'))
+        print("="*40 + "\n")
+
+        return render(request, 'core/home.html', context)
 
 
 ##vistas exclusivas del admin
@@ -274,3 +297,5 @@ def guardar_peso(request, sesion_id, bloque_id):
         return redirect('core:ejecutar_entrenamiento', sesion_id=sesion.id)
         
     return redirect('core:home')    
+
+

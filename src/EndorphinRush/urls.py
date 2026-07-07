@@ -29,7 +29,6 @@ urlpatterns = [
     path('exercises/', include('exercises.urls')),
     path('exercise_plans/', include('exercise_plans.urls')),
     path('forum/', include('forum.urls')),
-    path('webpush/', include('webpush.urls')),
 ]
 
 if settings.DEBUG:

@@ -45,9 +45,13 @@ class RutinaForm(forms.ModelForm):
         fields = [
             'nombre_rutina', 'descripcion_rutina', 'publico',
             'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo', 
-            'recordatorio_correo', 'recordatorio_popup'
+            'recordatorio_correo', 'hora_correo', 'recordatorio_popup', 'hora_popup'
         ]
         widgets = {
+            # Ocultamos los campos reales para que el usuario no los vea, pero Django sí los procese
+            'hora_correo': forms.HiddenInput(),
+            'hora_popup': forms.HiddenInput(),
+            
             'nombre_rutina': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Rutina de Pecho'}),
             'descripcion_rutina': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción de la rutina...', 'rows': 4}),
             # Agregada la clase 'dia-checkbox' a los días
@@ -64,6 +68,7 @@ class RutinaForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        
         # Obtenemos los selectores desde self.data y los booleanos desde cleaned_data
         h_c = self.data.get('hora_c_sel')
         m_c = self.data.get('min_c_sel')
@@ -75,26 +80,35 @@ class RutinaForm(forms.ModelForm):
         ap_p = self.data.get('ampm_p_sel')
         recordatorio_popup = cleaned_data.get('recordatorio_popup')
 
-        # Procesar Correo: Solo asigna hora si el switch está encendido y los campos están completos
-        if recordatorio_correo and all([h_c, m_c, ap_c]):
-            h_c_int = int(h_c)
-            m_c_int = int(m_c)
-            if ap_c == 'PM' and h_c_int < 12: h_c_int += 12
-            if ap_c == 'AM' and h_c_int == 12: h_c_int = 0
-            cleaned_data['hora_correo'] = time(h_c_int, m_c_int)
+        # Procesar Correo
+        if recordatorio_correo:
+            # Si el switch está prendido, verificamos que las 3 opciones tengan valor
+            if all([h_c, m_c, ap_c]):
+                h_c_int = int(h_c)
+                m_c_int = int(m_c)
+                if ap_c == 'PM' and h_c_int < 12: h_c_int += 12
+                if ap_c == 'AM' and h_c_int == 12: h_c_int = 0
+                cleaned_data['hora_correo'] = time(h_c_int, m_c_int)
+            else:
+                # 🛡️ FIX: Asignamos el error al switch (que es visible) para que el usuario sepa qué pasó
+                self.add_error('recordatorio_correo', '⚠️ Debes elegir la hora completa para activar el correo.')
+                cleaned_data['hora_correo'] = None
         else:
-            # Limpiamos el campo si el switch se apagó o la hora está incompleta
             cleaned_data['hora_correo'] = None
         
-        # Procesar Pop-up: Solo asigna hora si el switch está encendido y los campos están completos
-        if recordatorio_popup and all([h_p, m_p, ap_p]):
-            h_p_int = int(h_p)
-            m_p_int = int(m_p)
-            if ap_p == 'PM' and h_p_int < 12: h_p_int += 12
-            if ap_p == 'AM' and h_p_int == 12: h_p_int = 0
-            cleaned_data['hora_popup'] = time(h_p_int, m_p_int)
+        # Procesar Pop-up
+        if recordatorio_popup:
+            if all([h_p, m_p, ap_p]):
+                h_p_int = int(h_p)
+                m_p_int = int(m_p)
+                if ap_p == 'PM' and h_p_int < 12: h_p_int += 12
+                if ap_p == 'AM' and h_p_int == 12: h_p_int = 0
+                cleaned_data['hora_popup'] = time(h_p_int, m_p_int)
+            else:
+                # 🛡️ FIX: Asignamos el error al switch
+                self.add_error('recordatorio_popup', '⚠️ Debes elegir la hora completa para activar el pop-up.')
+                cleaned_data['hora_popup'] = None
         else:
-             # Limpiamos el campo si el switch se apagó o la hora está incompleta
             cleaned_data['hora_popup'] = None
         
         return cleaned_data
