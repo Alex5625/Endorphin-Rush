@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script> 
+<div class="container mt-4 mb-5">
+    <h2 class="fw-bold mb-4">Historial de Entrenamiento</h2>
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card shadow-sm p-3 border-0 rounded-4">
+                <div id='calendar'></div>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+{% for sesion in sesiones %}
+<div class="modal fade" id="modal-sesion-{{ sesion.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">{{ sesion.rutina.nombre_rutina }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="mb-3 text-muted small">
+                    <i class="bi bi-calendar-event me-1"></i>
+                    {{ sesion.fecha_inicio|date:"d M Y - H:i" }}
+                </div>
+
+                {% if sesion.esta_activa %}
+                    <span class="badge bg-success mb-3">En Curso</span>
+                {% endif %}
+
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover border">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ejercicio</th>
+                                <th>Serie</th>
+                                <th>Peso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for registro in sesion.registroserie_set.all %}
+                                <tr>
+                                    <td>{{ registro.bloque.ejercicio.nombre_ejercicio }}</td>
+                                    <td>{{ registro.numero_serie }}</td>
+                                    <td>{% if registro.peso_levantado %}{{ registro.peso_levantado }} kg{% else %}--{% endif %}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No se registraron series.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-between d-none bg-light" id="footer-sesion-{{ sesion.id }}">
+                <button type="button" class="btn btn-sm btn-outline-dark fw-bold" id="prev-sesion-{{ sesion.id }}">
+                    <i class="bi bi-chevron-left"></i> Anterior
+                </button>
+                <span class="text-muted small fw-medium" id="contador-sesion-{{ sesion.id }}">1 de 2</span>
+                <button type="button" class="btn btn-sm btn-outline-dark fw-bold" id="next-sesion-{{ sesion.id }}">
+                    Siguiente <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{{ historial_json|json_script:"historial-data" }}
+
+<script src="{% static 'core/js/calendario_historial.js' %}"></script>
+{% endblock %}
