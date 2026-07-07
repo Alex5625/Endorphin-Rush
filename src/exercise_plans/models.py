@@ -29,7 +29,6 @@ class Rutina(models.Model):
         blank=True,
     )
 
-
     publico = models.BooleanField(
         default=False,
         verbose_name="¿Es pública?"
