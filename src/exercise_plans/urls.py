@@ -21,4 +21,7 @@ urlpatterns = [
 
     # ❌ Eliminar Rutina
     path('eliminar/<int:pk>/', views.eliminar_rutina, name='eliminar_rutina'),
+    
+    # ⏰ Eliminar recordatorios 
+    path('rutina/<int:rutina_id>/eliminar-recordatorios/', views.eliminar_recordatorios_ajax, name='eliminar_recordatorios_ajax'),
 ]

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load webpush_notifications %}
+{% load static %}
 {% block title %}Inicio - Endorphin-Rush{% endblock %}
 
 {% block content %}
@@ -62,13 +62,6 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-bold m-0"><i class="bi bi-calendar-range me-2"></i>Tu Semana</h4>
-                <div>
-                    <i class="bi bi-bell-fill text-warning me-2"></i>
-                    <strong>Activa las notificaciones</strong> para avisarte cuando sea hora de entrenar.
-                </div>
-                
-                {% webpush_button with_class="btn btn-primary btn-sm fw-bold shadow-sm rounded-pill px-3" %}
-            
             <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn btn-primary btn-sm fw-bold shadow-sm rounded-pill px-3">
                 Gestionar
             </a>
@@ -88,11 +81,16 @@
                                 </div>
                                 <div class="card-body d-flex flex-column justify-content-center py-2">
                                     <h6 class="fw-bold mb-2 text-truncate" title="{{ rutina.nombre_rutina }}">{{ rutina.nombre_rutina }}</h6>
-                                    <div>
-                                        <span class="badge bg-white text-primary rounded-pill px-2 py-1" style="font-size: 0.75rem;">
+                                    <div class="mb-3">
+                                        <span class="badge bg-white text-primary rounded-pill px-2 py-1 shadow-sm" style="font-size: 0.75rem;">
                                             {{ rutina.rutinaejercicio_set.count }} Ejercicios
                                         </span>
                                     </div>
+                                    <button type="button" class="btn btn-sm btn-light text-danger fw-bold rounded-pill shadow-sm w-100 transition-hover" 
+                                            onclick="abrirModalEliminar('{{ rutina.id }}', '{{ rutina.nombre_rutina|escapejs }}')"
+                                            title="Eliminar recordatorios">
+                                        <i class="bi bi-bell-slash-fill me-1"></i> Quitar Alerta
+                                    </button>
                                 </div>
                                 {% comment %} <div class="card-footer bg-transparent border-0 pb-3 pt-1">
                                     <a href="{% url 'exercise_plans:editar_rutina' rutina.id %}" class="btn btn-light btn-sm w-100 fw-bold rounded-pill">Editar Rutina</a>
@@ -119,6 +117,67 @@
             <small class="text-muted"><i class="bi bi-arrows-left-right me-1"></i>Desliza para ver más</small>
         </div>
 
+        <div class="modal fade" id="modalEliminarRecordatorio" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow rounded-4">
+                    <div class="modal-header bg-danger text-white rounded-top-4 py-3">
+                        <h5 class="modal-title fw-bold">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> Eliminar Recordatorios
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-center">
+                        <p class="fs-6 mb-4">
+                            Estás a punto de desactivar las alertas para <strong id="lbl-eliminar-nombre" class="text-primary">--</strong>.<br>
+                            <span class="text-danger fw-medium small">⚠️ Esto cancelará las notificaciones para todos los días en los que esta rutina esté agendada.</span>
+                        </p>
+                        <p class="text-muted small mb-3">¿Qué recordatorios deseas eliminar?</p>
+                        
+                        <input type="hidden" id="hidden-rutina-id" value="">
+                        {% csrf_token %}
+
+                        <div class="d-flex flex-column gap-2">
+                            <button type="button" class="btn btn-outline-danger w-100" onclick="procesarEliminacion('correo')">
+                                <i class="bi bi-envelope-x me-2"></i> Solo Correo
+                            </button>
+                            <button type="button" class="btn btn-outline-warning w-100" onclick="procesarEliminacion('popup')">
+                                <i class="bi bi-bell-slash me-2"></i> Solo Pop-up
+                            </button>
+                            <button type="button" class="btn btn-danger w-100 fw-bold" onclick="procesarEliminacion('ambos')">
+                                <i class="bi bi-trash3-fill me-2"></i> Eliminar Ambos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        {% comment %} Modal de popup de notificaciones {% endcomment %}
+        <div class="modal fade" id="modalRecordatorio" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header bg-warning text-dark rounded-top-4 py-3 border-0">
+                        <h5 class="modal-title fw-bold">
+                            <i class="bi bi-bell-fill me-2"></i> ¡Hora de Entrenar!
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-center">
+                        <h4 id="lbl-nombre-rutina" class="fw-bold text-primary mb-3">--</h4>
+                        <p id="lbl-desc-rutina" class="text-muted mb-4">--</p>
+                        <button type="button" class="btn btn-warning w-100 fw-bold rounded-pill shadow-sm" data-bs-dismiss="modal">
+                            ¡Vamos a darle! 💪
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{ agenda_dict|json_script:"agenda-data-json" }}
+
+        <script src="{% static 'core/js/eliminar_recordatorio.js' %}"></script>
+        <script src="{% static 'core/js/recordatorio_popup.js' %}"></script>
     {% else %}
         <div class="text-center mt-5">
             <a href="{% url 'authentication:login' %}" class="btn btn-primary px-4 py-2 me-2 shadow-sm rounded-pill">Inicia sesión</a>

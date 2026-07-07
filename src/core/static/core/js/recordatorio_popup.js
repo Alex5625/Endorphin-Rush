@@ -1,88 +1,70 @@
 // static/core/js/recordatorio_popup.js
 document.addEventListener('DOMContentLoaded', function() {
     const dataContainer = document.getElementById('agenda-data-json');
-    if (!dataContainer) return;
+    if (!dataContainer) {
+        console.warn("🛑 No se encontró el contenedor del JSON de la agenda.");
+        return;
+    }
 
     try {
         const agendaJson = JSON.parse(dataContainer.textContent);
+        console.log("📦 Datos recibidos desde Django:", agendaJson);
         
         const fechaActual = new Date();
         const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
         const nombreHoy = diasSemana[fechaActual.getDay()];
 
+        console.log(`📅 Hoy es: ${nombreHoy}`);
         const rutinaDeHoy = agendaJson[nombreHoy];
+        console.log("🏋️‍♂️ Rutina detectada para hoy:", rutinaDeHoy);
 
-        // 🛠️ MODO DE PRUEBA: Si la URL tiene '?test=1', forzamos el modal con datos simulados o reales
         const urlParams = new URLSearchParams(window.location.search);
-        const modoTest = urlParams.get('test') === '1';
-
-        if (modoTest) {
-            console.log("🚀 Modo de prueba activo: Forzando visualización del recordatorio.");
-            document.getElementById('lbl-nombre-rutina').innerText = rutinaDeHoy?.nombre || "Rutina de Prueba (Modo Test)";
-            document.getElementById('lbl-desc-rutina').innerText = rutinaDeHoy?.descripcion || "Esta es una simulación en tiempo real para verificar el diseño de la alerta.";
+        if (urlParams.get('test') === '1') {
+            console.log("🚀 MODO TEST: Abriendo modal forzosamente.");
             const miModal = new bootstrap.Modal(document.getElementById('modalRecordatorio'));
             miModal.show();
-            return; // Detenemos el resto de la lógica para que no interfiera el localStorage
+            return; 
         }
 
-        // LÓGICA DE PRODUCCIÓN CONTINÚA AQUÍ
-        if (rutinaDeHoy && rutinaDeHoy.usa_popup) {
+        if (rutinaDeHoy && rutinaDeHoy.usa_popup && rutinaDeHoy.hora) {
+            console.log("✅ La rutina tiene el Pop-up activado y tiene hora configurada.");
+            
             const fechaClave = `${fechaActual.getFullYear()}-${fechaActual.getMonth() + 1}-${fechaActual.getDate()}`;
             const storageKey = `alerta_rutina_${fechaClave}`;
 
-            // Si ya se mostró hoy, no hacemos nada
             if (localStorage.getItem(storageKey) === 'visto') {
+                console.log("🚫 El Pop-up ya fue mostrado hoy (bloqueado por localStorage).");
                 return;
             }
 
-            // 🛡️ FIX VALIDACIÓN JS: Aseguramos que la hora no sea undefined y sea válida numéricamente
-            const [horaRutina, minRutina] = String(rutinaDeHoy.hora || '').split(':').map(Number);
-            
-            if (!Number.isFinite(horaRutina) || !Number.isFinite(minRutina)) {
-                console.warn('Hora de recordatorio inválida:', rutinaDeHoy.hora);
-                return;
-            }
-
+            const [horaRutina, minRutina] = String(rutinaDeHoy.hora).split(':').map(Number);
             const momentoAlerta = new Date();
             momentoAlerta.setHours(horaRutina, minRutina, 0, 0);
 
-            // Función interna para desplegar el modal de forma limpia
+            console.log(`⏰ Hora objetivo de la alarma: ${momentoAlerta.toLocaleTimeString()}`);
+            console.log(`🕒 Hora exacta en tu PC ahora: ${fechaActual.toLocaleTimeString()}`);
+
             const dispararNotificacion = () => {
+                console.log("🔔 ¡DISPARANDO NOTIFICACIÓN AHORA!");
                 document.getElementById('lbl-nombre-rutina').innerText = rutinaDeHoy.nombre;
                 document.getElementById('lbl-desc-rutina').innerText = rutinaDeHoy.descripcion || "Sin descripción disponible.";
-                
                 const miModal = new bootstrap.Modal(document.getElementById('modalRecordatorio'));
                 miModal.show();
-
                 localStorage.setItem(storageKey, 'visto');
             };
 
-            // ESCENARIO A: La hora configurada YA PASÓ o es justo AHORA
             if (fechaActual >= momentoAlerta) {
+                console.log("⚡ La hora ya pasó. Mostrando Pop-up de inmediato (si no se ha visto hoy).");
                 dispararNotificacion();
-                
-                // Limpieza de registros antiguos
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key && key.startsWith('alerta_rutina_') && key !== storageKey) {
-                        localStorage.removeItem(key);
-                    }
-                }
-            } 
-            // ESCENARIO B: El usuario entró ANTES. Programamos la alarma en tiempo real.
-            else {
+            } else {
                 const milisegundosFaltantes = momentoAlerta.getTime() - fechaActual.getTime();
-                console.log(`⏰ Alarma programada en tiempo real. El entrenamiento iniciará en ${(milisegundosFaltantes / 60000).toFixed(1)} minutos.`);
-                
-                setTimeout(function() {
-                    // Verificación de doble seguridad por si acaso mutó el almacenamiento mientras esperaba
-                    if (localStorage.getItem(storageKey) !== 'visto') {
-                        dispararNotificacion();
-                    }
-                }, milisegundosFaltantes);
+                console.log(`⏳ Faltan ${(milisegundosFaltantes / 60000).toFixed(1)} minutos. Temporizador activado en segundo plano.`);
+                setTimeout(dispararNotificacion, milisegundosFaltantes);
             }
+        } else {
+            console.log("❌ No se cumplen las condiciones para la alarma (No hay rutina, switch apagado o falta hora).");
         }
     } catch (e) {
-        console.error("Error en el sistema de alertas:", e);
+        console.error("💥 Error crítico procesando la agenda JSON:", e);
     }
 });
