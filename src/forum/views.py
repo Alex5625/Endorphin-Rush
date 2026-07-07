@@ -75,3 +75,19 @@ def editar_publicacion(request, post_id):
             rutina_qs = (rutina_qs | Rutina.objects.filter(id=publicacion.rutina_vinculada_id, autor=request.user))
         form.fields['rutina_vinculada'].queryset = rutina_qs.distinct()
     return render(request, 'forum/create_post.html', {'form':form, 'publicacion': publicacion})
+
+@login_required
+@user_passes_test(es_entrenador_o_admin, login_url='forum:board')
+def eliminar_publicacion(request, post_id):
+    # SE PONE ASI PARA MANTENER COHERENCIA DE EQUIPO. SE MODIFICARÁ A FUTURO
+    # PARA HACER UN SOFT DELETE COMO SE RECOMENDÓ !!! 
+    publicacion = get_object_or_404(Publicacion, id=post_id)
+
+    if publicacion.autor != request.user:
+        return redirect('forum:board')
+
+    if request.method == 'POST':
+        publicacion.delete()
+        return redirect('forum:board')
+
+    return render(request, 'forum/board.html', {'publicacion': publicacion})

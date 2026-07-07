@@ -29,9 +29,15 @@
                         </div>
                         <div class="col-auto">
                             {% if post.autor == request.user %}
-                                <a href="{% url 'forum:editar_publicacion' post.id %}" class="btn boton-verde btn-sm shadow-sm fw-bold text-dark">
-                                    <i class="bi bi-pencil-square me-2"></i>Editar
+                                <a href="{% url 'forum:editar_publicacion' post.id %}" class="btn boton-verde">
+                                    <i class="bi bi-pencil-square me-2"></i>
                                 </a>
+                                <form action="{% url 'forum:eliminar_publicacion' post.id %}" method="POST" style="display: inline;" onsubmit="return confirm('¿Eliminar publicación?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn boton-eliminar">
+                                        <i class="bi bi-trash3 me-2"></i>
+                                    </button>
+                                </form>
                             {% endif %}
                         </div>
                     </div>
