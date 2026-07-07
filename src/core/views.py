@@ -11,6 +11,7 @@ from exercise_plans.models import Rutina
 from datetime import datetime
 from django.utils import timezone
 from .models import SesionEntrenamiento, RegistroSerie
+import json
 
 def home(request):
     context = {}
@@ -298,4 +299,27 @@ def guardar_peso(request, sesion_id, bloque_id):
         
     return redirect('core:home')    
 
+# AQUI INICIA HISTORIAL DE ENTRENAMIENTOS
+@login_required
+def historial_entrenamiento(request):
+    sesiones = SesionEntrenamiento.objects.filter(
+        usuario=request.user
+    ).select_related(
+        'rutina'
+    ).prefetch_related(
+        'registroserie_set__bloque__ejercicio'
+    ).order_by('fecha_inicio')
 
+    historial_calendario = []
+    for sesion in sesiones:
+        historial_calendario.append({
+            'id': str(sesion.id),
+            'title': sesion.rutina.nombre_rutina,
+            'start': sesion.fecha_inicio.isoformat(),
+            'allDay': False
+        })
+
+    return render(request, 'core/historial.html', {
+        'sesiones': sesiones,
+        'historial_json': historial_calendario
+        })
