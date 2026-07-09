@@ -41,6 +41,17 @@
                                     <small class="text-muted">
                                         <i class="bi bi-person me-1"></i>{{ rutina.autor.get_full_name|default:rutina.autor.username }} | 
                                     </small>
+                                    {% if rutina.publico %}
+                                        <small class="text-muted">
+                                            Pública
+                                            <i class="bi bi-globe"></i>
+                                        </small>
+                                    {% else %}
+                                        <small class="text-muted">
+                                            Privada
+                                            <i class="bi bi-lock"></i>
+                                        </small>
+                                    {% endif %}
                                 </div>
                                 <span class="badge bg-secondary rounded-pill">
                                     {{ rutina.rutinaejercicio_set.count }} ejercicios
