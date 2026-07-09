@@ -38,7 +38,7 @@ class SesionEntrenamiento(models.Model):
     fecha_fin = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.usuario.username} - {self.rutina.nombre} - {self.fecha_inicio.strftime('%d/%m %H:%M')}"
+        return f"{self.usuario.username} - {self.rutina.nombre_rutina} - {self.fecha_inicio.strftime('%d/%m %H:%M')}"
 
     @property
     def esta_activa(self):

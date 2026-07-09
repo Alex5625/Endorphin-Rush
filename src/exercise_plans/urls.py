@@ -22,6 +22,11 @@ urlpatterns = [
     # ❌ Eliminar Rutina
     path('eliminar/<int:pk>/', views.eliminar_rutina, name='eliminar_rutina'),
     
+    # 🗑️ Papelera de Rutinas
+    path('papelera/', views.papelera_rutinas, name='papelera_rutinas'),
+    # 🗑️ Restaurar Rutina desde Papelera
+    path('rutina/<int:pk>/restaurar/', views.restaurar_rutina, name='restaurar_rutina'),
+    
     # ⏰ Eliminar recordatorios 
     path('rutina/<int:rutina_id>/eliminar-recordatorios/', views.eliminar_recordatorios_ajax, name='eliminar_recordatorios_ajax'),
 ]
