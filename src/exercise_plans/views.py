@@ -3,6 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
 from django.http import JsonResponse
+from django.db.models import RestrictedError
+from django.utils.safestring import mark_safe
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from .forms import RutinaForm, RutinaEjercicioFormSet
 from .models import Rutina
@@ -27,7 +30,7 @@ def gestion_rutinas_view(request):
 @login_required
 def mis_rutinas(request):
     # Panel privado/personal del usuario (Aquí ve todas las suyas: públicas y privadas)
-    rutinas_propias = Rutina.objects.filter(autor=request.user)
+    rutinas_propias = Rutina.objects.filter(autor=request.user, activa=True)
     return render(request, 'exercise_plans/gestion_rutinas.html', {'rutinas': rutinas_propias, 'action': 'personal'})
 
 @login_required
@@ -157,18 +160,47 @@ def guardar_rutina(request, rutina_id):
 
 @login_required
 def eliminar_rutina(request, pk):
-    rutina = get_object_or_404(Rutina, pk=pk)
+    rutina = get_object_or_404(Rutina, pk=pk, autor=request.user)
+
+    # En lugar de destruir (rutina.delete()), simplemente "apagamos" la rutina
+    rutina.activa = False
     
-    # Control de seguridad: Impedir que un usuario elimine rutinas ajenas por URL directa
-    if rutina.autor != request.user:
-        messages.error(request, "No tienes permisos para eliminar esta rutina.")
-        return redirect('exercise_plans:lista_rutinas')
-        
-    titulo = rutina.nombre_rutina
-    rutina.delete()
+    # Opcional pero recomendado: Quitarla de la agenda semanal si estaba programada
+    rutina.lunes = False
+    rutina.martes = False
+    rutina.miercoles = False
+    rutina.jueves = False
+    rutina.viernes = False
+    rutina.sabado = False
+    rutina.domingo = False
     
-    messages.success(request, f"La rutina '{titulo}' ha sido eliminada exitosamente.")
-    return redirect('exercise_plans:lista_rutinas')
+    rutina.save()
+
+    messages.success(request, f"La rutina '{rutina.nombre_rutina}' fue archivada. Tu historial de pesos se mantiene intacto.")
+    return redirect('exercise_plans:mis_rutinas')
+
+@login_required
+def papelera_rutinas(request):
+    # Filtramos solo las rutinas inactivas del usuario
+    rutinas_archivadas = Rutina.objects.filter(autor=request.user, activa=False).order_by('-id')
+    
+    context = {
+        'rutinas': rutinas_archivadas,
+        'titulo': 'Papelera de Rutinas'
+    }
+    return render(request, 'exercise_plans/papelera_rutinas.html', context)
+
+@login_required
+@require_POST 
+def restaurar_rutina(request, pk):
+    rutina = get_object_or_404(Rutina, pk=pk, autor=request.user)
+    
+    # Volvemos a encender el interruptor
+    rutina.activa = True
+    rutina.save()
+    
+    messages.success(request, f"¡La rutina '{rutina.nombre_rutina}' ha sido restaurada con éxito! Ya puedes verla en tu listado principal.")
+    return redirect('exercise_plans:papelera_rutinas')
 
 @require_POST
 def eliminar_recordatorios_ajax(request, rutina_id):

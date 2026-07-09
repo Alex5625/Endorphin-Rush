@@ -14,9 +14,18 @@
         </div>
         
         {% if action == 'personal' %}
-            <a href="{% url 'exercise_plans:crear_rutina' %}" class="btn boton-agregar px-4 shadow-sm">
-                <i class="bi bi-plus-lg me-2"></i>Nueva Rutina
-            </a>
+            <div class="col-md-6 col-lg-4 d-flex justify-content-end gap-2">
+                <div class="d-flex gap-2">
+                    <a href="{% url 'exercise_plans:papelera_rutinas' %}" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Ver Papelera
+                    </a>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'exercise_plans:crear_rutina' %}" class="btn boton-agregar px-4 shadow-sm">
+                        <i class="bi bi-plus-lg me-2"></i>Nueva Rutina
+                    </a>
+                </div>
+            </div>
         {% endif %}
     </div>
 

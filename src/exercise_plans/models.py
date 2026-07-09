@@ -63,6 +63,8 @@ class Rutina(models.Model):
         verbose_name="Hora del Pop-up"
     )
     
+    activa = models.BooleanField(default=True)
+    
     class Meta:
         verbose_name = "Rutina"
         verbose_name_plural = "Rutinas"
