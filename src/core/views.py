@@ -8,10 +8,11 @@ from django.views.decorators.cache import never_cache
 from core.models import HistorialAcciones, SesionEntrenamiento
 from exercises.models import Ejercicio
 from exercise_plans.models import Rutina
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import SesionEntrenamiento, RegistroSerie
 import json
+from django.db.models import Avg
 
 def home(request):
     context = {}
@@ -300,10 +301,10 @@ def guardar_peso(request, sesion_id, bloque_id):
     return redirect('core:home')    
 
 # AQUI INICIA HISTORIAL DE ENTRENAMIENTOS
-@login_required
-def historial_entrenamiento(request):
+
+def datos_calendario_historial(usuario):
     sesiones = SesionEntrenamiento.objects.filter(
-        usuario=request.user
+        usuario=usuario
     ).select_related(
         'rutina'
     ).prefetch_related(
@@ -319,7 +320,40 @@ def historial_entrenamiento(request):
             'allDay': False
         })
 
+    return sesiones, historial_calendario
+
+def datos_stats_entrenamiento(usuario, dias):
+    fecha_filtrada= timezone.now() - timedelta (days=dias)
+
+    sesiones = SesionEntrenamiento.objects.filter(
+        usuario = usuario,
+        registroserie__peso_levantado__isnull = False,
+        fecha_inicio__gte=fecha_filtrada,
+    ).annotate(
+        peso_promedio=Avg('registroserie__peso_levantado')
+    ).order_by('fecha_inicio')
+
+    fechas_x = []
+    pesos_y = []
+
+    for sesion in sesiones:
+        fechas_x.append(sesion.fecha_inicio.strftime('%d %b'))
+        pesos_y.append(round(float(sesion.peso_promedio), 2))
+    
+    return fechas_x, pesos_y
+
+
+@login_required
+def historial_entrenamiento(request):
+    dias_filtro = int(request.GET.get('dias', 30))
+    sesiones, historial_calendario = datos_calendario_historial(request.user)
+    fechas_x, pesos_y = datos_stats_entrenamiento(request.user, dias_filtro)
+
     return render(request, 'core/historial.html', {
         'sesiones': sesiones,
-        'historial_json': historial_calendario
-        })
+        'historial_json': historial_calendario,
+        'fechas_json': fechas_x,
+        'pesos_json': pesos_y,
+        'dias_actual': dias_filtro
+
+    })
