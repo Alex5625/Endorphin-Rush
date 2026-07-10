@@ -84,7 +84,7 @@ def home(request):
         print(agenda_dict.get('Martes'))
         print("="*40 + "\n")
 
-        return render(request, 'core/home.html', context)
+    return render(request, 'core/home.html', context)
 
 
 ##vistas exclusivas del admin
