@@ -246,10 +246,10 @@
                 {% endif %}
 
                 <div class="mt-4 d-flex justify-content-end">
-                    <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn btn-outline-secondary me-2 px-4">
+                    <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn boton-outline-naranja me-2 px-4">
                         Cancelar
                     </a>
-                    <button type="submit" class="btn {% if action == 'editar' %}boton-morado{% else %}btn-verde{% endif %} px-4">
+                    <button type="submit" class="btn {% if action == 'editar' %}boton-morado{% else %}boton-verde{% endif %} px-4">
                         {% if action == 'editar' %}
                             Guardar Cambios
                         {% else %}

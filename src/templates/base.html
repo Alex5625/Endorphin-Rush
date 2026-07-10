@@ -83,13 +83,10 @@
                                     <i class="bi bi-shield-lock me-2 m-0" style="font-size: 1.1rem; line-height: 1;"></i>
                                     <span class="poppins-medium m-0" style="line-height: 1; padding-top: 2px;">Admin</span>
                                 </a>
-                                
                                 <ul class="dropdown-menu dropdown-menu-dark shadow-sm border-0 mt-2" aria-labelledby="adminDropdown">
-                                    
-                                
                                     <li>
                                         <a href="{% url 'exercises:lista_ejercicios' %}" class="dropdown-item d-flex align-items-center poppins-medium">
-                                            <i class="bi bi-list-task me-2"></i>Editar Ejercicios
+                                            <i class="bi bi-list-task me-2"></i>Gestión de Ejercicios
                                         </a>
                                     </li>
                                     <li>
@@ -102,40 +99,57 @@
                                             <i class="bi bi-clock me-2"></i>Pendientes
                                         </a>
                                     </li>
-
-                                {% else %}
-                                    {% for grupo in user.groups.all %}
-                                        
-                                        {% if grupo.name == 'Coach' %}
-                                            <li>
-                                                <a href="{% url 'exercises:lista_ejercicios' %}" class="dropdown-item d-flex align-items-center poppins-medium">
-                                                    <i class="bi bi-list-task me-2"></i>Editar Ejercicios
-                                                </a>
-                                            </li>
-                                        {% endif %}
-
-                                        {% if grupo.name == 'Administrador' %}
-                                            <li>
-                                                <a href="{% url 'exercises:lista_ejercicios' %}" class="dropdown-item d-flex align-items-center poppins-medium">
-                                                    <i class="bi bi-list-task me-2"></i>Editar Ejercicios
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="{% url 'core:panel_auditoria' %}" class="dropdown-item d-flex align-items-center poppins-medium">
-                                                    <i class="bi bi-shield-check me-2"></i>Auditoría
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="{% url 'core:panel_pendientes' %}" class="dropdown-item d-flex align-items-center poppins-medium">
-                                                    <i class="bi bi-clock me-2"></i>Pendientes
-                                                </a>
-                                            </li>
-                                        {% endif %}
-                                        
-                                    {% endfor %}
-                                {% endif %}
                                 </ul>
-                        </li>
+                            </li>
+
+                        {% else %}
+                            {% for grupo in user.groups.all %}
+                                
+                                {% if grupo.name == 'Coach' or grupo.name == 'Administrador' %}
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle px-3 py-2 rounded-2 custom-nav-link d-flex align-items-center justify-content-center text-nowrap text-white" href="#" id="adminDropdown{{ forloop.counter }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-shield-lock me-2 m-0" style="font-size: 1.1rem; line-height: 1;"></i>
+                                            <span class="poppins-medium m-0" style="line-height: 1; padding-top: 2px;">Admin</span>
+                                        </a>
+                                        
+                                        <ul class="dropdown-menu dropdown-menu-dark shadow-sm border-0 mt-2" aria-labelledby="adminDropdown{{ forloop.counter }}">
+                                            
+                                            {% if grupo.name == 'Coach' %}
+                                                <li>
+                                                    <a href="{% url 'exercises:catalogo_ejercicios' %}" class="dropdown-item d-flex align-items-center poppins-medium">
+                                                        <i class="bi bi-list-task me-2 m-0"></i>Gestión de Ejercicios
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'forum:create_post' %}" class="dropdown-item d-flex align-items-center poppins-medium">
+                                                        <i class="bi bi-shield-check me-2 m-0"></i>Publicar en Foro
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+
+                                            {% if grupo.name == 'Administrador' %}
+                                                <li>
+                                                    <a href="{% url 'exercises:lista_ejercicios' %}" class="dropdown-item d-flex align-items-center poppins-medium">
+                                                        <i class="bi bi-list-task me-2"></i>Gestión de Ejercicios
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'core:panel_auditoria' %}" class="dropdown-item d-flex align-items-center poppins-medium">
+                                                        <i class="bi bi-shield-check me-2"></i>Auditoría
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'core:panel_pendientes' %}" class="dropdown-item d-flex align-items-center poppins-medium">
+                                                        <i class="bi bi-clock me-2"></i>Pendientes
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                            
+                                        </ul>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
                     {% endif %}
                 <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center gap-3 ms-lg-auto mt-3 mt-lg-0">
                     {% if user.is_authenticated %}

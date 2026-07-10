@@ -7,6 +7,7 @@
   --light-text: #ffda9d;
   --shadow: 1px 2px 1px rgba(0, 0, 0, 0.175) !important;
 }
+
 body {
   font-family: "Poppins", sans-serif;
   background: #FFFF;
@@ -16,27 +17,10 @@ body {
   padding: 0;
 }
 
-.poppins-thin {
-  font-family: "Poppins", sans-serif;
-  font-weight: 100;
-  font-style: normal;
-}
-
-.poppins-extralight {
-  font-family: "Poppins", sans-serif;
-  font-weight: 200;
-  font-style: normal;
-}
-
+/*textos*/
 .poppins-light {
   font-family: "Poppins", sans-serif;
   font-weight: 300;
-  font-style: normal;
-}
-
-.poppins-regular {
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
   font-style: normal;
 }
 
@@ -46,82 +30,10 @@ body {
   font-style: normal;
 }
 
-.poppins-semibold {
-  font-family: "Poppins", sans-serif;
-  font-weight: 600;
-  font-style: normal;
-}
-
 .poppins-bold {
   font-family: "Poppins", sans-serif;
   font-weight: 700;
   font-style: normal;
-}
-
-.poppins-extrabold {
-  font-family: "Poppins", sans-serif;
-  font-weight: 800;
-  font-style: normal;
-}
-
-.poppins-black {
-  font-family: "Poppins", sans-serif;
-  font-weight: 900;
-  font-style: normal;
-}
-
-.poppins-thin-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 100;
-  font-style: italic;
-}
-
-.poppins-extralight-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 200;
-  font-style: italic;
-}
-
-.poppins-light-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 300;
-  font-style: italic;
-}
-
-.poppins-regular-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
-  font-style: italic;
-}
-
-.poppins-medium-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-  font-style: italic;
-}
-
-.poppins-semibold-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 600;
-  font-style: italic;
-}
-
-.poppins-bold-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 700;
-  font-style: italic;
-}
-
-.poppins-extrabold-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 800;
-  font-style: italic;
-}
-
-.poppins-black-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 900;
-  font-style: italic;
 }
 
 .text-purple {
@@ -144,38 +56,6 @@ body {
     color: #ffb649;
 }
 
-
-.boton-morado {
-    background: var(--primary-color) !important;
-    color: white;
-    font-weight: bold;
-}
-
-.boton-morado:hover {
-    background-color: #ce86fe !important;
-}
-
-.boton-outline-morado {
-    background: transparent !important;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-    font-weight: bold;
-}
-
-.boton-outline-morado:hover {
-    background-color: var(--primary-color) !important;
-    color: white;
-}
-
-.boton-outline-morado:focus {
-    background-color: var(--primary-color) !important;
-    color: white;
-}
-
-.boton-outline-morado:active {
-    background-color: var(--primary-color) !important;
-    color: white;
-}
 
 .custom-nav-link {
     transition: all 0.2s ease-in-out;
@@ -257,6 +137,8 @@ body {
     box-shadow: 0 0.125rem 0.25rem var(--secondary-color);
 }
 
+/*fondos personalizados*/
+
 .background-purple {
     background-color: var(--primary-color);
     color: white;
@@ -277,8 +159,65 @@ body {
     color: #212529;
 }
 
+/*botones personalizados*/
+
+.boton-morado {
+    background: var(--primary-color) !important;
+    color: white;
+    font-weight: bold;
+}
+
+.boton-morado:hover {
+    background-color: #ce86fe !important;
+}
+
+.boton-outline-morado {
+    background: transparent !important;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    font-weight: bold;
+}
+
+.boton-outline-morado:hover {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.boton-outline-morado:focus {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.boton-outline-morado:active {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.boton-outline-naranja {
+    background: transparent !important;
+    color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+    font-weight: bold;
+}
+
+.boton-outline-naranja:hover {
+    background-color: var(--secondary-color) !important;
+    color: white;
+}
+
+.boton-outline-naranja:focus {
+    background-color: var(--secondary-color) !important;
+    color: white;
+}
+
+.boton-outline-naranja:active {
+    background-color: var(--secondary-color) !important;
+    color: white;
+}
+
 .boton-verde {
     background-color: var(--tertiary-color);
+    font-weight: bold;
 }
 
 .boton-verde:hover {
@@ -296,6 +235,7 @@ body {
     color:#212529
 }
 
+/*publicaciones*/
 .rutina-recomendada {
     background-color: #e6c9f9;
     padding: 10px;
@@ -316,13 +256,11 @@ body {
 
 /* Estilos para el scroll horizontal en móviles */
 .agenda-scroll-container {
-    
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
-    scroll-snap-type: x mandatory; /* Efecto imán al deslizar */
+    -webkit-overflow-scrolling: touch; 
+    scroll-snap-type: x mandatory;
 }
 
-/* Ocultar la barra de scroll para un diseño más limpio */
 .agenda-scroll-container::-webkit-scrollbar {
     display: none;
 }
@@ -332,8 +270,8 @@ body {
 }
 
 .tarjeta-dia {
-    scroll-snap-align: start; /* Alineación del efecto imán */
-    min-width: 260px; /* Ancho mínimo para que no se aplasten en celular */
+    scroll-snap-align: start; 
+    min-width: 260px;
 }
 
 /* Suavizado de selector de hora para notificaciones */
@@ -360,7 +298,7 @@ body {
     padding: 10px 0 !important;
 }
 .fc-col-header-cell-cushion {
-    color: #adb5bd !important; /* Gris suave */
+    color: #adb5bd !important; 
     font-weight: 600;
     font-size: 0.8rem;
     text-transform: uppercase;

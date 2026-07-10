@@ -6,7 +6,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="texto-titulo">Gestión de Ejercicios</h2>
-        <button type="button" class="btn boton-agregar" data-bs-toggle="modal" data-bs-target="#modalAgregar">
+        <button type="button" class="btn boton-morado" data-bs-toggle="modal" data-bs-target="#modalAgregar">
             + Nuevo Ejercicio
         </button>
     </div>
@@ -106,7 +106,7 @@
                 <div class="modal-footer border-secondary">
                     <h6 class="text-start text-danger">* Campos obligatorios</h6>
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn boton-agregar">Guardar Ejercicio</button>
+                    <button type="submit" class="btn boton-morado">Guardar Ejercicio</button>
                 </div>
             </form>
         </div>
@@ -114,7 +114,7 @@
 </div>
 
 <div>
-    <a href="{% url 'exercise_types:gestion_tipos_ejercicio' %}" class="btn shadow-sm fw-bold boton-agregar">
+    <a href="{% url 'exercise_types:gestion_tipos_ejercicio' %}" class="btn shadow-sm fw-bold boton-morado">
         <i class="bi bi-arrow-right-circle me-2"></i> Modificar categorías de ejercicio
     </a>
 

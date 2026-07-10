@@ -63,7 +63,7 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-bold m-0"><i class="bi bi-calendar-range me-2"></i>Tu Semana</h4>
             <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn boton-morado btn-sm fw-bold shadow-sm rounded-pill px-3">
-                Gestionar
+                Gestionar Rutinas
             </a>
         </div>
 
@@ -179,7 +179,7 @@
                 
                 {% for notificacion in notificaciones_pendientes %}
                     <div class="toast show shadow-lg border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="toast-header bg-primary text-white">
+                        <div class="toast-header background-purple text-white">
                             <i class="bi bi-bell-fill me-2 text-warning"></i>
                             <strong class="me-auto">Actualización de Rutina</strong>
                             <small class="text-white-50">¡Nueva!</small>
@@ -187,7 +187,7 @@
                         </div>
                         <div class="toast-body bg-light">
                             <p class="mb-2">{{ notificacion.mensaje }}</p>
-                            <a href="{% url 'core:leer_notificacion' notificacion.id %}" class="btn btn-sm btn-success w-100 fw-bold">                                
+                            <a href="{% url 'core:leer_notificacion' notificacion.id %}" class="btn btn-sm boton-verde w-100 fw-bold">                                
                                 <i class="bi bi-eye"></i> Ir a ver la rutina
                             </a>
                         </div>
