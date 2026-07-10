@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import MultipleObjectsReturned
@@ -15,6 +15,8 @@ from django.utils import timezone
 from .models import SesionEntrenamiento, RegistroSerie
 import json
 from django.db.models import Avg
+from .models import TerminosCondiciones
+from .forms import TerminosCondicionesForm
 
 def home(request):
     context = {}
@@ -145,8 +147,39 @@ def autorizar_ejercicio(request, pk, accion):
 def panel_auditoria(request):
 ###Vista del panel exclusivo para que el admin vea todo el historial de movimientos
 
+    #1. logica de terminos y condiciones
+    if request.method == 'POST':
+        # Caso A: El admin quiere reactivar una versión anterior de TyC
+        if 'activar_version_id' in request.POST:
+            version_id = request.POST.get('activar_version_id')
+            version_a_activar = get_object_or_404(TerminosCondiciones, id=version_id)
+            version_a_activar.activo = True
+            version_a_activar.save() #esto apaga las demás automáticamente
+            return redirect('core:panel_auditoria')
+        
+        # Caso B: El admin está publicando unos TyC completamente nuevos
+        elif 'crear_tyc' in request.POST:
+            form_tyc = TerminosCondicionesForm(request.POST)
+            if form_tyc.is_valid():
+                nueva_version = form_tyc.save(commit=False)
+                nueva_version.activo = True #la nueva entra en vigencia de inmediato
+                nueva_version.save()
+                return redirect('core:panel_auditoria')
+    else:
+        # Si no es POST (es decir, el admin solo entró a mirar), cargamos el formulario vacío
+        form_tyc = TerminosCondicionesForm()
+
+    #2. consultas en la base de datos
     logs = HistorialAcciones.objects.all() #viene ordenado por fecha desde el modelo
-    return render(request, 'core/panel_auditoria.html', {'logs': logs})
+    historial_tyc = TerminosCondiciones.objects.all() # El historial legal
+
+    #3. contexto para pasarle al html
+    context = {
+        'logs': logs,
+        'form_tyc': form_tyc,
+        'historial_tyc': historial_tyc
+    }
+    return render(request, 'core/panel_auditoria.html', context)
 
 # 1- Vista para listar los ejercicios que esperan aprobación
 

@@ -1,7 +1,8 @@
-# from django import forms
+from django import forms
 # from django.contrib.auth.models import User
 # from django.contrib.auth.forms import UserCreationForm
 # #from .models import Ejercicio, PerfilUsuario, TipoEjercicio
+from .models import TerminosCondiciones
 
 # from .models import HistorialAcciones
 # from authentication.models import PerfilUsuario
@@ -115,3 +116,19 @@
             
 #         # 3. Retornamos el valor en minusculas listo para ser guardado
 #         return nombre
+
+class TerminosCondicionesForm(forms.ModelForm):
+    class Meta:
+        model = TerminosCondiciones
+        fields = ['titulo', 'contenido']
+        widgets = {
+            'titulo': forms.TextInput(attrs={
+                'class': 'form-control shadow-sm', 
+                'placeholder': 'Ej: TyC Versión 2.0 - Actualización de Invierno'
+            }),
+            'contenido': forms.Textarea(attrs={
+                'class': 'form-control shadow-sm', 
+                'rows': 6, 
+                'placeholder': 'Escribe aquí las cláusulas legales...'
+            }),
+        }
