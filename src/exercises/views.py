@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from exercise_types.models import TipoEjercicio
+from django.views.decorators.http import require_POST
 from .forms import ejercicioForm
 # Create your views here.
 
@@ -77,6 +78,7 @@ def editar_ejercicio(request, pk):
 
 @login_required
 @user_passes_test(es_coach_o_admin, login_url='core:home')
+@require_POST
 def eliminar_ejercicio(request, pk):
     
     ejercicio = get_object_or_404(Ejercicio, pk=pk, activo=True)

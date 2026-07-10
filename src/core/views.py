@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import MultipleObjectsReturned
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_POST
 from core.models import HistorialAcciones, SesionEntrenamiento
 from exercises.models import Ejercicio
 from exercise_plans.models import Rutina
@@ -97,6 +99,7 @@ def es_admin_o_staff(user):
 
 @login_required
 @user_passes_test(es_admin_o_staff, login_url='core:home')
+@require_POST
 def autorizar_ejercicio(request, pk, accion):
 
 ##Vista para que el admin apruebe o rechace un ejercicio.
@@ -211,7 +214,7 @@ def procesar_ejercicio(request, pk):
 #Nueva vista para la HU-24: control del boton:)
 @login_required
 def cambiar_estado_sesion(request, rutina_id):
-    rutina = get_object_or_404(Rutina, id=rutina_id)
+    rutina = get_object_or_404(Rutina, id=rutina_id, autor=request.user)
     
     #1.buscamos si el usuario ya está entrenando en este momento
     sesion_activa = SesionEntrenamiento.objects.filter(
@@ -243,7 +246,7 @@ def cambiar_estado_sesion(request, rutina_id):
 @login_required
 def ejecutar_entrenamiento(request, sesion_id):
     # 1. Buscamos la sesión activa en la base de datos
-    sesion = get_object_or_404(SesionEntrenamiento, id=sesion_id)
+    sesion = get_object_or_404(SesionEntrenamiento, id=sesion_id, usuario=request.user)
     
     # 2. Obtenemos la rutina asociada a esta sesión
     rutina = sesion.rutina 
@@ -281,24 +284,44 @@ def guardar_peso(request, sesion_id, bloque_id):
     if request.method == 'POST':
         from exercise_plans.models import RutinaEjercicio
         
-        sesion = get_object_or_404(SesionEntrenamiento, id=sesion_id)
-        bloque = get_object_or_404(RutinaEjercicio, id=bloque_id)
+        sesion = get_object_or_404(SesionEntrenamiento, id=sesion_id, usuario=request.user)
+        # Nota: Si RutinaEjercicio no tiene un campo 'usuario' directo (sino que pasa por Rutina), 
+        # asegúrate de que esta validación funcione en tu modelo, o cámbiala a `rutina__usuario=request.user`.
+        bloque = get_object_or_404(RutinaEjercicio, id=bloque_id, rutina__autor=request.user)
         
         # Recorremos el número de series para atrapar cada caja de texto
         for i in range(1, bloque.series + 1):
             peso_str = request.POST.get(f'peso_serie_{i}')
             if peso_str: # Solo guardamos si el usuario de verdad escribió algo
-                RegistroSerie.objects.update_or_create(
-                    sesion=sesion,
-                    bloque=bloque,
-                    numero_serie=i,
-                    defaults={'peso_levantado': float(peso_str)}
-                )
+                try:
+                    RegistroSerie.objects.update_or_create(
+                        sesion=sesion,
+                        bloque=bloque,
+                        numero_serie=i,
+                        defaults={'peso_levantado': float(peso_str)}
+                    )
+                except MultipleObjectsReturned:
+                    # Si el ORM detecta filas duplicadas por un error previo de concurrencia,
+                    # se capturan todas esas filas corruptas.
+                    registros_duplicados = RegistroSerie.objects.filter(
+                        sesion=sesion, 
+                        bloque=bloque, 
+                        numero_serie=i
+                    )
+                    
+                    # Nos quedamos con el primer registro válido y lo actualizamos con el nuevo peso
+                    registro_valido = registros_duplicados.first()
+                    registro_valido.peso_levantado = float(peso_str)
+                    registro_valido.save()
+                    
+                    # Eliminamos silenciosamente el resto de registros duplicados 
+                    # para que la base de datos vuelva a estar limpia
+                    registros_duplicados.exclude(id=registro_valido.id).delete()
         
-        #redireccionamos de vuelta a la misma pantalla para que siga entrenando
+        # se redirecciona de vuelta a la misma pantalla para que siga entrenando
         return redirect('core:ejecutar_entrenamiento', sesion_id=sesion.id)
         
-    return redirect('core:home')    
+    return redirect('core:home')
 
 # AQUI INICIA HISTORIAL DE ENTRENAMIENTOS
 

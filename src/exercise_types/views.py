@@ -1,10 +1,11 @@
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.http import require_POST
 from .models import TipoEjercicio
 from .forms import TipoEjercicioForm
 from django.contrib import messages
-from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
+
+
 # Create your views here.
 
 def es_coach_o_admin(user):
@@ -55,6 +56,7 @@ def editar_tipo_ejercicio(request, pk):
 #HU-31 permite al entrenador eliminar un grupo muscular en forma directa.
 @login_required
 @user_passes_test(es_coach_o_admin, login_url='core:home')
+@require_POST
 def eliminar_tipo_ejercicio(request, pk):
 
     categoria = get_object_or_404(TipoEjercicio, pk=pk, activo=True)

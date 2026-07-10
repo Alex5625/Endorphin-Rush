@@ -12,7 +12,9 @@ class Rutina(models.Model):
 
     autor = models.ForeignKey(
         User, 
-        on_delete=models.CASCADE, 
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True, 
         verbose_name="Autor/Entrenador",
         related_name="rutinas_creadas",  
     )
@@ -75,6 +77,13 @@ class Rutina(models.Model):
                 name='unique_rutina_per_user'
             )
         ] 
+    
+    
+    def save(self, *args, **kwargs):
+        # Obligamos a que las reglas de negocio (tu función clean) 
+        # se ejecuten SIEMPRE antes de guardar en la base de datos.
+        self.full_clean()
+        super().save(*args, **kwargs)
         
     def clean(self):
         super().clean()
@@ -115,7 +124,7 @@ class Rutina(models.Model):
 
 class RutinaEjercicio(models.Model):
     rutina = models.ForeignKey(Rutina, on_delete=models.CASCADE)
-    ejercicio = models.ForeignKey(Ejercicio, on_delete=models.CASCADE, verbose_name="Ejercicio incluido en la rutina")
+    ejercicio = models.ForeignKey(Ejercicio, on_delete=models.PROTECT, verbose_name="Ejercicio incluido en la rutina")
     
     series = models.IntegerField(default=3, verbose_name="Número de Series")
     descanso = models.IntegerField(default=20, verbose_name="Descanso entre series (segundos)")

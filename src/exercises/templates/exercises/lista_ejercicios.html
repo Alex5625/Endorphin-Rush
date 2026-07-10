@@ -37,23 +37,32 @@
                         <a href="{% url 'exercises:editar_ejercicio' ejercicio.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
                             <i class="bi bi-pencil-square"></i>
                         </a>
-                        <a href="{% url 'exercises:eliminar_ejercicio' ejercicio.pk %}" 
-                            class="btn btn-sm btn-outline-danger rounded-2" 
-                            title="Eliminar"
-                            onclick="return confirm('¿Estás segura de que deseas eliminar el ejercicio «{{ ejercicio.nombre_ejercicio }}»?');">
-                            <i class="bi bi-trash"></i>
-                        </a>
+                        
+                        <form method="POST" action="{% url 'exercises:eliminar_ejercicio' ejercicio.pk %}" class="d-inline" onsubmit="return confirm('¿Estás segura de que deseas eliminar el ejercicio «{{ ejercicio.nombre_ejercicio }}»?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
 
                         {% if user.is_staff and not ejercicio.autorizado %}
-                            <small class="text-warning d-block mb-1">Acciones de Admin:</small>
-                            <div class="btn-group btn-group-sm mt-1" role="group">
-                                <a href="{% url 'core:autorizar_ejercicio' ejercicio.pk 'aprobar' %}" class="btn btn-success rounded-start-2">
-                                    Aprobar
-                                </a>
-                                <a href="{% url 'core:autorizar_ejercicio' ejercicio.pk 'rechazar' %}" class="btn btn-danger rounded-end-2"
-                                    onclick="return confirm('¿Estás segura de rechazar y eliminar permanentemente este ejercicio?');">
-                                    Rechazar
-                                </a>
+                            <small class="text-warning d-block mb-1 mt-3">Acciones de Admin:</small>
+                            <div class="d-flex gap-1 mt-1">
+                                
+                                <form method="POST" action="{% url 'core:autorizar_ejercicio' ejercicio.pk 'aprobar' %}" class="m-0 p-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success rounded-2">
+                                        Aprobar
+                                    </button>
+                                </form>
+                                
+                                <form method="POST" action="{% url 'core:autorizar_ejercicio' ejercicio.pk 'rechazar' %}" class="m-0 p-0" onsubmit="return confirm('¿Estás segura de rechazar y eliminar permanentemente este ejercicio?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger rounded-2">
+                                        Rechazar
+                                    </button>
+                                </form>
+                                
                             </div>
                         {% endif %}
                     </div>

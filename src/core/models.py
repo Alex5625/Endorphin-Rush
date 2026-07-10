@@ -75,6 +75,13 @@ class RegistroSerie(models.Model):
         verbose_name="Peso (kg)"
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['sesion', 'bloque', 'numero_serie'], 
+                name='unique_serie_por_bloque_y_sesion'
+            )
+        ]
     def __str__(self):
         return f"Sesión {self.sesion.id} - Serie {self.numero_serie}: {self.peso_levantado}kg"
 
