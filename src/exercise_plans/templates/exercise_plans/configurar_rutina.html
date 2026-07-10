@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+{{ inline_form.ejercicio }}
 <div class="container mt-5">
     <div class="card shadow-sm border-0">
         <div class="card-header bg-dark text-white py-3">
@@ -172,10 +173,21 @@
                                     {% endfor %}
                                     
                                     <td>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text bg-white text-muted"><i class="bi bi-dumbell"></i></span>
-                                            {{ inline_form.ejercicio }}
+                                        <div class="row g-2 align-items-center contenedor-filtro-ejercicio">
+                                            <div class="col-md-5">
+                                                <select class="form-select form-select-sm selector-grupo-muscular">
+                                                    <option value="">— Filtrar Tipo —</option>
+                                                    </select>
+                                            </div>
+                                            
+                                            <div class="col-md-7">
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text bg-white text-muted"><i class="bi bi-dumbell"></i></span>
+                                                    {{ inline_form.ejercicio }}
+                                                </div>
+                                            </div>
                                         </div>
+                                        
                                         {% if inline_form.ejercicio.errors %}
                                             <div class="text-danger small mt-1">{{ inline_form.ejercicio.errors|join:", " }}</div>
                                         {% endif %}
@@ -257,11 +269,114 @@
 
         function toggle() {
             const activo = Array.from(checkboxes).some(cb => cb.checked);
-            seccion.style.display = activo ? 'block' : 'none';
+            if(seccion) seccion.style.display = activo ? 'block' : 'none';
         }
 
         checkboxes.forEach(cb => cb.addEventListener('change', toggle));
         toggle(); // Estado inicial
+
+        //filtro por grupos musculares al que pertenece el ejercicio
+
+        //el puente es el diccionario leyendo la base de datos (Django inyecta esto aquí)
+        const categoriasDesdeBD = {
+            {% for ej in todos_los_ejercicios %}
+                "{{ ej.id }}": "{% if ej.tipo_ejercicio %}{{ ej.tipo_ejercicio.nombre_categoria|escapejs }}{% else %}Sin Categoría{% endif %}",
+            {% endfor %}
+        };
+
+
+        let mapaCategorias = new Map();
+        let categoriasDetectadas = new Set();
+
+        //se extraen las opciones y se agrupan usando los datos 
+        function analizarOpcionesOriginales(selectEjercicio) {
+            if (!selectEjercicio || mapaCategorias.size > 0) return;
+            
+            Array.from(selectEjercicio.options).forEach(opcion => {
+                if (!opcion.value) return; // Ignoramos el "---------" vacío
+                
+                //se lee la categoría exacta usando el ID
+                let categoria = categoriasDesdeBD[opcion.value] || "Sin Categoría";
+                
+                categoriasDetectadas.add(categoria);
+                
+                if (!mapaCategorias.has(categoria)) mapaCategorias.set(categoria, []);
+                mapaCategorias.get(categoria).push({ value: opcion.value, text: opcion.text });
+            });
+        }
+
+        // Configurar una fila individual (Nivel 1 -> Nivel 2)
+        function inicializarFilaFiltro(fila) {
+            const selectGrupo = fila.querySelector('.selector-grupo-muscular');
+            const selectEjercicio = fila.querySelector('select[name$="-ejercicio"]');
+            
+            if (!selectGrupo || !selectEjercicio) return;
+
+            // 1. Analizamos los datos
+            analizarOpcionesOriginales(selectEjercicio);
+
+            // 2. Llenamos el selector de la izquierda (Categorías)
+            if (selectGrupo.options.length <= 1) {
+                Array.from(categoriasDetectadas).sort().forEach(cat => {
+                    let opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.text = cat;
+                    selectGrupo.appendChild(opt);
+                });
+            }
+
+            const valorInicial = selectEjercicio.value;
+
+            // 3. percibir el cambio en la categoría
+            selectGrupo.addEventListener('change', function() {
+                const categoriaSeleccionada = this.value;
+                
+                // Limpiar lista de la derecha
+                selectEjercicio.innerHTML = '<option value="">---------</option>';
+
+                if (!categoriaSeleccionada) {
+                    //si elige la opción por defecto, mostramos todos
+                    mapaCategorias.forEach(ejercicios => {
+                        ejercicios.forEach(ej => {
+                            let opt = document.createElement('option');
+                            opt.value = ej.value;
+                            opt.text = ej.text;
+                            selectEjercicio.appendChild(opt);
+                        });
+                    });
+                } else {
+                    //solo inyectar los de la categoría seleccionada
+                    const filtrados = mapaCategorias.get(categoriaSeleccionada) || [];
+                    filtrados.forEach(ej => {
+                        let opt = document.createElement('option');
+                        opt.value = ej.value;
+                        opt.text = ej.text;
+                        selectEjercicio.appendChild(opt);
+                    });
+                }
+            });
+
+            //si estabamos en modo Editar, mantenemos seleccionado lo que ya tenía
+            if (valorInicial) {
+                selectEjercicio.value = valorInicial;
+            }
+        }
+
+        //inicializamos las filas que ya están en la pantalla al cargar
+        document.querySelectorAll('.fila-ejercicio').forEach(inicializarFilaFiltro);
+
+        //Aplicar la lógica de filtrado cuando se presiona [+] para agregar un nuevo ejercicio
+        const btnAnadir = document.getElementById('btn-anadir-ejercicio');
+        if (btnAnadir) {
+            btnAnadir.addEventListener('click', function() {
+                setTimeout(() => {
+                    const filas = document.querySelectorAll('.fila-ejercicio');
+                    const ultimaFila = filas[filas.length - 1];
+                    if (ultimaFila) inicializarFilaFiltro(ultimaFila);
+                }, 100); //pequeña espera para que Django termine de inyectar el HTML de la nueva fila
+            });
+        }
+
     });
 </script>
 

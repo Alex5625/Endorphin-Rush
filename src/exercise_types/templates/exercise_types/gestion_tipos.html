@@ -66,12 +66,13 @@
                                         <a href="{% url 'exercise_types:editar_tipo_ejercicio' cat.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <a href="{% url 'exercise_types:eliminar_tipo_ejercicio' cat.pk %}" 
-                                           class="btn btn-sm btn-outline-danger rounded-2" 
-                                           title="Eliminar"
-                                           onclick="return confirm('¿Estás segura de que deseas eliminar la categoría «{{ cat.nombre_categoria }}»? Los entrenadores ya no podrán asignarla.');">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
+                                        
+                                        <form method="POST" action="{% url 'exercise_types:eliminar_tipo_ejercicio' cat.pk %}" class="d-inline" onsubmit="return confirm('¿Estás segura de que deseas eliminar la categoría «{{ cat.nombre_categoria }}»? Los entrenadores ya no podrán asignarla.');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                                 {% empty %}

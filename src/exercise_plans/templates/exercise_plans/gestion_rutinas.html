@@ -80,9 +80,12 @@
                                             <i class="bi bi-pencil-square me-2"></i>Editar
                                         </a>
                                         
-                                        <a href="{% url 'exercise_plans:eliminar_rutina' rutina.id %}" class="btn boton-eliminar px-4 shadow-sm text-dark fw-medium">
-                                            <i class="bi bi-trash me-2"></i>Eliminar
-                                        </a>
+                                        <form method="POST" action="{% url 'exercise_plans:eliminar_rutina' rutina.id %}" class="m-0 p-0">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn boton-eliminar px-4 shadow-sm text-dark fw-medium">
+                                                    <i class="bi bi-trash me-2"></i>Eliminar
+                                                </button>
+                                        </form>
                                     </div>
                                 {% else %}
                                     <form action="{% url 'exercise_plans:guardar_rutina' rutina.id %}" method="POST" style="display: inline;">

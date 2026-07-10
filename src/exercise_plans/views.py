@@ -7,10 +7,12 @@ from django.db.models import RestrictedError
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from forum.models import Publicacion
 from .forms import RutinaForm, RutinaEjercicioFormSet
-from .models import Rutina
+from .models import Rutina, Notificacion
 import json
 import time
+from exercises.models import Ejercicio
 
 @login_required
 def gestion_rutinas_view(request):
@@ -30,7 +32,7 @@ def gestion_rutinas_view(request):
 @login_required
 def mis_rutinas(request):
     # Panel privado/personal del usuario (Aquí ve todas las suyas: públicas y privadas)
-    rutinas_propias = Rutina.objects.filter(autor=request.user, activa=True)
+    rutinas_propias = Rutina.objects.filter(autor=request.user, activa=True, es_snapshot=False).distinct()
     return render(request, 'exercise_plans/gestion_rutinas.html', {'rutinas': rutinas_propias, 'action': 'personal'})
 
 @login_required
@@ -61,10 +63,20 @@ def crear_rutina(request):
         if not es_coach and 'publico' in form.fields:
             del form.fields['publico']
             
+        #proteger el formset vacio
+        for form_ejercicio in formset:
+            if 'ejercicio' in form_ejercicio.fields:
+                form_ejercicio.fields['ejercicio'].queryset = Ejercicio.objects.filter(
+                    Q(autorizado=True) | Q(autor=request.user)
+                )
+            
     context = {
         'form': form,
         'formset': formset,
-        'action': 'crear'
+        'action': 'crear',
+        'todos_los_ejercicios': Ejercicio.objects.select_related('tipo_ejercicio').filter(
+            Q(autorizado=True) | Q(autor=request.user))
+        
     }
     return render(request, 'exercise_plans/configurar_rutina.html', context)
             
@@ -110,7 +122,10 @@ def editar_rutina(request, pk):
         'form': form,
         'formset': formset,
         'action': 'editar',
-        'rutina': rutina
+        'rutina': rutina,
+        'todos_los_ejercicios': Ejercicio.objects.select_related('tipo_ejercicio').filter(
+            Q(autorizado=True) | Q(autor=request.user)
+        )
     }
     return render(request, 'exercise_plans/configurar_rutina.html', context)
 
@@ -159,6 +174,7 @@ def guardar_rutina(request, rutina_id):
 
 
 @login_required
+@require_POST
 def eliminar_rutina(request, pk):
     rutina = get_object_or_404(Rutina, pk=pk, autor=request.user)
 
@@ -202,7 +218,64 @@ def restaurar_rutina(request, pk):
     messages.success(request, f"¡La rutina '{rutina.nombre_rutina}' ha sido restaurada con éxito! Ya puedes verla en tu listado principal.")
     return redirect('exercise_plans:papelera_rutinas')
 
+@login_required
+@require_POST 
+def publicar_y_notificar_rutina(request, rutina_id):
+    
+    rutina_viva = get_object_or_404(Rutina, id=rutina_id, autor=request.user)
+    texto_post = request.POST.get('contenido')
+
+    # se crea el snapshot de la rutina viva
+    snapshot = Rutina.objects.create(
+        nombre_rutina=rutina_viva.nombre_rutina,
+        descripcion=rutina_viva.descripcion,
+        autor=rutina_viva.autor,
+        es_snapshot=True,
+        rutina_padre=rutina_viva  # El snapshot recuerda de dónde viene
+    )
+
+    # se clonan en bloque los ejercicios de la rutina viva al snapshot
+    from exercise_plans.models import RutinaEjercicio
+    for bloque in rutina_viva.rutinaejercicio_set.all():
+        RutinaEjercicio.objects.create(
+            rutina=snapshot, 
+            ejercicio=bloque.ejercicio,
+            series=bloque.series,
+            repeticiones=bloque.repeticiones
+        )
+
+    # se crea el post atado al foro
+    nueva_publicacion = Publicacion.objects.create(
+        autor=request.user,
+        contenido=texto_post,
+        rutina_vinculada=snapshot
+    )
+
+    # Se buscan todos los usuarios que han clonado esta rutina viva y que no sean el autor original
+    # Esto asegura que solo los usuarios que realmente han hecho una copia de la rutina reciban la notificación, y no el propio autor.
+    usuarios_que_clonaron = Rutina.objects.filter(
+        rutina_padre=rutina_viva, 
+        es_snapshot=False
+    ).exclude(autor=rutina_viva.autor).values_list('autor', flat=True).distinct()
+
+    # Generamos la notificación para cada uno
+    url_nuevo_post = reverse('forum:detalle_publicacion', args=[nueva_publicacion.id])
+    
+    notificaciones_bulk = [
+        Notificacion(
+            usuario_id=user_id,
+            mensaje=f"Actualización disponible: El entrenador ha publicado una nueva versión de '{rutina_viva.nombre_rutina}'.",
+            enlace=url_nuevo_post
+        )
+        for user_id in usuarios_que_clonaron
+    ]
+    Notificacion.objects.bulk_create(notificaciones_bulk) # Guarda todas de un solo golpe (optimización)
+
+    messages.success(request, "Rutina publicada y usuarios notificados exitosamente.")
+    return redirect('forum:inicio_foro')
+
 @require_POST
+@login_required
 def eliminar_recordatorios_ajax(request, rutina_id):
     # print(f"🚀 ¡AJAX llegó a la vista! Intentando modificar rutina ID: {rutina_id}")
     # print(f"👤 Usuario actual: {request.user.username} (ID: {request.user.id})")

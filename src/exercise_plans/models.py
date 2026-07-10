@@ -12,7 +12,9 @@ class Rutina(models.Model):
 
     autor = models.ForeignKey(
         User, 
-        on_delete=models.CASCADE, 
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True, 
         verbose_name="Autor/Entrenador",
         related_name="rutinas_creadas",  
     )
@@ -63,6 +65,20 @@ class Rutina(models.Model):
         verbose_name="Hora del Pop-up"
     )
     
+    es_snapshot = models.BooleanField(
+        default=False,
+        verbose_name="¿Es una copia congelada para el foro?"
+    )
+    
+    rutina_padre = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='derivadas',
+        help_text="Apunta a la rutina original viva creada por el entrenador."
+    )
+    
     activa = models.BooleanField(default=True)
     
     class Meta:
@@ -75,6 +91,13 @@ class Rutina(models.Model):
                 name='unique_rutina_per_user'
             )
         ] 
+    
+    
+    def save(self, *args, **kwargs):
+        # Obligamos a que las reglas de negocio (tu función clean) 
+        # se ejecuten SIEMPRE antes de guardar en la base de datos.
+        self.full_clean()
+        super().save(*args, **kwargs)
         
     def clean(self):
         super().clean()
@@ -115,7 +138,7 @@ class Rutina(models.Model):
 
 class RutinaEjercicio(models.Model):
     rutina = models.ForeignKey(Rutina, on_delete=models.CASCADE)
-    ejercicio = models.ForeignKey(Ejercicio, on_delete=models.CASCADE, verbose_name="Ejercicio incluido en la rutina")
+    ejercicio = models.ForeignKey(Ejercicio, on_delete=models.PROTECT, verbose_name="Ejercicio incluido en la rutina")
     
     series = models.IntegerField(default=3, verbose_name="Número de Series")
     descanso = models.IntegerField(default=20, verbose_name="Descanso entre series (segundos)")
@@ -126,3 +149,10 @@ class RutinaEjercicio(models.Model):
         
     def __str__(self):
         return f"{self.ejercicio.nombre} en {self.rutina.nombre_rutina} "
+    
+class Notificacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones')
+    mensaje = models.CharField(max_length=255)
+    enlace = models.CharField(max_length=255) # URL al post del foro
+    leida = models.BooleanField(default=False)
+    fecha = models.DateTimeField(auto_now_add=True)

@@ -6,7 +6,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="texto-titulo">Gestión de Ejercicios</h2>
-        <button type="button" class="btn boton-morado" data-bs-toggle="modal" data-bs-target="#modalAgregar">
+        <button type="button" class="btn boton-agregar" data-bs-toggle="modal" data-bs-target="#modalAgregar">
             + Nuevo Ejercicio
         </button>
     </div>
@@ -24,7 +24,18 @@
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ ejercicio.nombre_ejercicio|capfirst }}</h5>
-                        <h6 class="card-subtitle mb-2">{{ ejercicio.tipo_ejercicio.nombre_categoria|capfirst }}</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="card-subtitle mb-0 text-muted">{{ ejercicio.tipo_ejercicio.nombre_categoria|capfirst }}</h6>
+                            
+                            <small class="text-secondary">
+                                <i class="bi bi-person-circle"></i> 
+                                {% if ejercicio.autor %}
+                                    <strong>{{ ejercicio.autor.username }}</strong>
+                                {% else %}
+                                    <span class="text-danger">Sin autor</span>
+                                {% endif %}
+                            </small>
+                        </div>
                         
                         {% if ejercicio.autorizado %}
                             <span class="badge" id="aprobado">Aprobado</span>
@@ -34,26 +45,37 @@
 
                         <p class="card-text text-truncate">{{ ejercicio.descripcion_ejercicio }}</p>
                         
-                        <a href="{% url 'exercises:editar_ejercicio' ejercicio.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a href="{% url 'exercises:eliminar_ejercicio' ejercicio.pk %}" 
-                            class="btn btn-sm btn-outline-danger rounded-2" 
-                            title="Eliminar"
-                            onclick="return confirm('¿Estás segura de que deseas eliminar el ejercicio «{{ ejercicio.nombre_ejercicio }}»?');">
-                            <i class="bi bi-trash"></i>
-                        </a>
+                        {% if ejercicio.autor == request.user %}
+                            <a href="{% url 'exercises:editar_ejercicio' ejercicio.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            
+                            <form method="POST" action="{% url 'exercises:eliminar_ejercicio' ejercicio.pk %}" class="d-inline" onsubmit="return confirm('¿Estás segura de que deseas eliminar el ejercicio «{{ ejercicio.nombre_ejercicio }}»?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        {% endif %}
 
                         {% if user.is_staff and not ejercicio.autorizado %}
-                            <small class="text-warning d-block mb-1">Acciones de Admin:</small>
-                            <div class="btn-group btn-group-sm mt-1" role="group">
-                                <a href="{% url 'core:autorizar_ejercicio' ejercicio.pk 'aprobar' %}" class="btn btn-success rounded-start-2">
-                                    Aprobar
-                                </a>
-                                <a href="{% url 'core:autorizar_ejercicio' ejercicio.pk 'rechazar' %}" class="btn btn-danger rounded-end-2"
-                                    onclick="return confirm('¿Estás segura de rechazar y eliminar permanentemente este ejercicio?');">
-                                    Rechazar
-                                </a>
+                            <small class="text-warning d-block mb-1 mt-3">Acciones de Admin:</small>
+                            <div class="d-flex gap-1 mt-1">
+                                
+                                <form method="POST" action="{% url 'core:autorizar_ejercicio' ejercicio.pk 'aprobar' %}" class="m-0 p-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success rounded-2">
+                                        Aprobar
+                                    </button>
+                                </form>
+                                
+                                <form method="POST" action="{% url 'core:autorizar_ejercicio' ejercicio.pk 'rechazar' %}" class="m-0 p-0" onsubmit="return confirm('¿Estás segura de rechazar y eliminar permanentemente este ejercicio?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger rounded-2">
+                                        Rechazar
+                                    </button>
+                                </form>
+                                
                             </div>
                         {% endif %}
                     </div>
@@ -92,7 +114,7 @@
 </div>
 
 <div>
-    <a href="{% url 'exercise_types:gestion_tipos_ejercicio' %}" class="btn shadow-sm fw-bold boton-morado mt-3">
+    <a href="{% url 'exercise_types:gestion_tipos_ejercicio' %}" class="btn shadow-sm fw-bold boton-agregar">
         <i class="bi bi-arrow-right-circle me-2"></i> Modificar categorías de ejercicio
     </a>
 

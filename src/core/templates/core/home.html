@@ -174,6 +174,29 @@
             </div>
         </div>
 
+        {% if notificaciones_pendientes %}
+            <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+                
+                {% for notificacion in notificaciones_pendientes %}
+                    <div class="toast show shadow-lg border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header bg-primary text-white">
+                            <i class="bi bi-bell-fill me-2 text-warning"></i>
+                            <strong class="me-auto">Actualización de Rutina</strong>
+                            <small class="text-white-50">¡Nueva!</small>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body bg-light">
+                            <p class="mb-2">{{ notificacion.mensaje }}</p>
+                            <a href="{% url 'core:leer_notificacion' notificacion.id %}" class="btn btn-sm btn-success w-100 fw-bold">                                
+                                <i class="bi bi-eye"></i> Ir a ver la rutina
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+            </div>
+        {% endif %}
+
         {{ agenda_dict|json_script:"agenda-data-json" }}
 
         <script src="{% static 'core/js/eliminar_recordatorio.js' %}"></script>

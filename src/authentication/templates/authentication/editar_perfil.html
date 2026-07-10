@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-lg-8 col-md-10">
             <div class="card shadow-lg border-0 rounded-3">
                 <div class="card-header background-purple text-white text-center py-3">
                     <h3 class="mb-0 fw-bold">
@@ -13,50 +13,102 @@
                 </div>
                 
                 <div class="card-body p-4">
-                    <form method="POST" novalidate>
-                        {% csrf_token %}
-                        
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold text-secondary">{{ field.label }}</label>
-                                {{ field }}
+                    <div class="row">
+                        <div class="col-md-7">
+                            <form method="POST" novalidate>
+                                {% csrf_token %}
                                 
-                                {% if field.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in field.errors %}
-                                            <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
-                                        {% endfor %}
+                                {% for field in form %}
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold text-secondary">{{ field.label }}</label>
+                                        {{ field }}
+                                        
+                                        {% if field.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in field.errors %}
+                                                    <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
                                     </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                        
-                        <div class="row g-2 mt-4">
-                            <div class="col-4">
-                                <a href="{% url 'core:home' %}" class="btn btn-outline-secondary w-100 fw-bold">
-                                    Cancelar
-                                </a>
-                            </div>
-                            <div class="col-4">
-                                <button type="submit" class="btn boton-morado w-100 fw-bold shadow-sm">
-                                    <i class="bi bi-floppy-fill me-1"></i> Guardar Cambios
-                                </button>
-                            </div>
-                            <div class="col-4">
-                                <button type="button" class="btn boton-eliminar w-100 fw-bold shadow-sm" onclick="confirmarYEliminar()">
-                                    <i class="bi bi-trash-fill me-1"></i> Eliminar Cuenta
-                                </button>
-                            </div>
+                                {% endfor %}
+                                
+                                <div class="row g-2 mt-4">
+                                    <div class="col-12 col-xl-4">
+                                        <a href="{% url 'core:home' %}" class="btn btn-outline-secondary w-100 fw-bold">
+                                            Cancelar
+                                        </a>
+                                    </div>
+                                    <div class="col-12 col-xl-4">
+                                        <button type="submit" class="btn btn-success w-100 fw-bold shadow-sm" title="Guardar Cambios">
+                                            <i class="bi bi-floppy-fill"></i> Guardar
+                                        </button>
+                                    </div>
+                                    <div class="col-12 col-xl-4">
+                                        <button type="button" class="btn btn-danger w-100 fw-bold shadow-sm" onclick="confirmarYEliminar()" title="Eliminar Cuenta">
+                                            <i class="bi bi-trash-fill"></i> Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <form id="form-eliminar" action="{% url 'authentication:eliminar_perfil' %}" method="POST" style="display: none;">
+                                {% csrf_token %}
+                            </form>
                         </div>
-                    </form>
-                    <form id="form-eliminar" action="{% url 'authentication:eliminar_perfil' %}" method="POST" style="display: none;">
-                        {% csrf_token %}
-                    </form>
+                        
+                        <div class="col-md-5 d-flex flex-column align-items-center justify-content-center border-start-md border-top border-md-top-0 pt-4 pt-md-0 mt-4 mt-md-0 ps-md-4">
+                            
+                            <div class="text-center">
+                                <i class="bi bi-person-badge text-primary mb-3 d-block" style="font-size: 4rem;"></i>
+                                <h5 class="fw-bold text-secondary mb-3">Nivel de Acceso</h5>
+                                
+                                {% if user.is_superuser or user.is_staff %}
+                                    <span class="badge bg-danger fs-6 py-2 px-4 rounded-pill shadow-sm">
+                                        <i class="bi bi-shield-lock-fill me-1"></i> Staff / Admin
+                                    </span>
+                                    <p class="text-muted small mt-3 px-2">Tienes control total sobre la plataforma y el catálogo de ejercicios.</p>
+                                    
+                                {% else %}
+                                    {% for group in user.groups.all %}
+                                        {% if group.name == 'Coach' %}
+                                            <span class="badge bg-warning text-dark fs-6 py-2 px-4 rounded-pill shadow-sm">
+                                                <i class="bi bi-star-fill me-1"></i> Entrenador
+                                            </span>
+                                            <p class="text-muted small mt-3 px-2">Puedes crear ejercicios, diseñar rutinas y compartirlas en el foro público.</p>
+                                        {% else %}
+                                            <span class="badge bg-info text-dark fs-6 py-2 px-4 rounded-pill shadow-sm">
+                                                {{ group.name }}
+                                            </span>
+                                        {% endif %}
+                                        
+                                    {% empty %}
+                                        <span class="badge bg-success fs-6 py-2 px-4 rounded-pill shadow-sm">
+                                            <i class="bi bi-lightning-charge-fill me-1"></i> Gymbro
+                                        </span>
+                                        <p class="text-muted small mt-3 px-2">Atleta enfocado en su entrenamiento. Puedes adoptar las rutinas del foro.</p>
+                                    {% endfor %}
+                                    
+                                {% endif %}
+                                
+                                <hr class="w-50 mx-auto my-4 text-muted">
+                                <small class="text-muted d-block">Usuario: <strong>@{{ user.username }}</strong></small>
+                            </div>
+                            
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    @media (min-width: 768px) {
+        .border-start-md { border-left: 1px solid #dee2e6 !important; }
+        .border-md-top-0 { border-top: none !important; }
+    }
+</style>
+
 <script>
 function confirmarYEliminar() {
     // 1. Pregunta al usuario
