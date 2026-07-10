@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-8 mx-auto">
             <div class="card shadow">
-                <div class="card-header bg-success text-white">
+                <div class="card-header background-purple text-white">
                     <h4 class="mb-0">
                         {% if publicacion %}
                             <i class="bi bi-pencil-square me-2"></i>Editar Publicación
@@ -22,7 +22,7 @@
                         {{ form.as_p }}
                         
                         <div class="mt-4">
-                            <button type="submit" class="btn {% if publicacion %}btn-warning{% else %}btn-success{% endif %} fw-bold">
+                            <button type="submit" class="btn {% if publicacion %}boton-eliminar{% else %}boton-morado{% endif %} fw-bold">
                                 {% if publicacion %}
                                     Guardar Cambios
                                 {% else %}

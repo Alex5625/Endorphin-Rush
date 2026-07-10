@@ -91,7 +91,10 @@
                     <div class="rutina-recomendada">
                         Rutina recomendada: 
                         <strong>{{ post.rutina_vinculada.nombre_rutina }}</strong>
-                        <div class="mt-3 p-3 bg-light border rounded">          
+                        <div class="mt-3 p-3 bg-light border rounded">
+                            <button type="button" class="btn btn-outline-dark shadow-sm fw-medium rounded-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalRutina{{ post.id }}">
+                                <i class="bi bi-eye me-2" style="line-height: 1;"></i> Ver Detalles
+                            </button>       
                             <form action="{% url 'forum:adoptar_rutina' post.id %}" method="POST" class="d-inline">
                                 {% csrf_token %}
                                 <button type="submit" class="btn boton-morado shadow-sm fw-medium rounded-3">
@@ -100,14 +103,57 @@
                             </form>
                         </div>
                     </div>
+                    <div class="modal fade" id="modalRutina{{ post.id }}" tabindex="-1" aria-labelledby="modalRutinaLabel{{ post.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                
+                <div class="modal-header text-white border-0" style="background-color: #310a75;">
+                    <h5 class="modal-title poppins-medium" id="modalRutinaLabel{{ post.id }}">
+                        <i class="bi bi-card-checklist me-2"></i>{{ post.rutina_vinculada.nombre_rutina }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body poppins-regular">
+                    
+                    {% if post.rutina_vinculada.descripcion %}
+                        <p class="text-muted mb-4">
+                            {{ post.rutina_vinculada.descripcion }}
+                        </p>
+                    {% endif %}
+                    
+                    <h6 class="poppins-medium fw-bold mb-3 border-bottom pb-2">Ejercicios de la rutina:</h6>
+                    
+                    <ul class="list-group list-group-flush">
+                        
+                        {% for ejercicio in post.rutina_vinculada.ejercicios.all %}
+                            <li class="list-group-item d-flex align-items-center px-0">
+                                <i class="bi bi-check2-circle me-3" style="color: #850dfd; font-size: 1.2rem;"></i>
+                                {{ ejercicio.nombre_ejercicio }} 
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item px-0 text-muted fst-italic">Esta rutina aún no tiene ejercicios registrados.</li>
+                        {% endfor %}
+                        
+                    </ul>
+                </div>
+                
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary rounded-3 poppins-medium" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
                     {% endif %}
                 </div>
             </div>
         {% empty %}
+        
             <div class="alert alert-warning text-center">
                 Aún no hay publicaciones
             </div>
         {% endfor %}
+        
         </div>
     </div>
 </div>
