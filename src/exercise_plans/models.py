@@ -65,6 +65,20 @@ class Rutina(models.Model):
         verbose_name="Hora del Pop-up"
     )
     
+    es_snapshot = models.BooleanField(
+        default=False,
+        verbose_name="¿Es una copia congelada para el foro?"
+    )
+    
+    rutina_padre = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='derivadas',
+        help_text="Apunta a la rutina original viva creada por el entrenador."
+    )
+    
     activa = models.BooleanField(default=True)
     
     class Meta:
@@ -135,3 +149,10 @@ class RutinaEjercicio(models.Model):
         
     def __str__(self):
         return f"{self.ejercicio.nombre} en {self.rutina.nombre_rutina} "
+    
+class Notificacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones')
+    mensaje = models.CharField(max_length=255)
+    enlace = models.CharField(max_length=255) # URL al post del foro
+    leida = models.BooleanField(default=False)
+    fecha = models.DateTimeField(auto_now_add=True)

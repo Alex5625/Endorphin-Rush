@@ -9,7 +9,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 from core.models import HistorialAcciones, SesionEntrenamiento
 from exercises.models import Ejercicio
-from exercise_plans.models import Rutina
+from exercise_plans.models import Notificacion, Rutina
 from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import SesionEntrenamiento, RegistroSerie
@@ -20,8 +20,15 @@ def home(request):
     context = {}
     
     if request.user.is_authenticated:
+        notificaciones_pendientes = Notificacion.objects.filter(
+            usuario=request.user, 
+            leida=False
+        ).order_by('-fecha')
+        
+        context['notificaciones_pendientes'] = notificaciones_pendientes
+        
         # Obtenemos TODAS las rutinas del usuario en una sola consulta a la base de datos
-        rutinas_usuario = list(Rutina.objects.filter(autor=request.user))
+        rutinas_usuario = list(Rutina.objects.filter(autor=request.user, es_snapshot=False))    
         
         # Armamos el calendario buscando en la lista en memoria usando 'next'
         agenda = {
@@ -380,3 +387,15 @@ def historial_entrenamiento(request):
         'dias_actual': dias_filtro
 
     })
+    
+@login_required
+def leer_notificacion(request, notificacion_id):
+    # Buscamos la notificación asegurándonos que sea del usuario actual
+    notificacion = get_object_or_404(Notificacion, id=notificacion_id, usuario=request.user)
+    
+    # La marcamos como leída
+    notificacion.leida = True
+    notificacion.save()
+    
+    # Lo enviamos directo al foro (al enlace que guardamos antes)
+    return redirect(notificacion.enlace)
