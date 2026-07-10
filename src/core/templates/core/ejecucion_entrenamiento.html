@@ -87,6 +87,12 @@
                                                 
                                                 <span class="input-group-text bg-white text-secondary font-weight-bold">kg</span>
                                             </div>
+
+                                            {% if not serie.peso %}
+                                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2 w-100 btn-temporizador" data-tiempo="{{ item.bloque.descanso }}">
+                                                ⏱️ Descansar
+                                            </button>
+                                            {% endif %}
                                         </div>
                                         {% endfor %}
                                         
@@ -96,6 +102,7 @@
                                         <button type="submit" class="btn btn-primary btn-sm font-weight-bold shadow-sm">
                                             <i class="fas fa-save mr-1"></i> Guardar Pesos
                                         </button>
+                                        
                                     </div>
                                 </form>
                             </div>
@@ -118,4 +125,41 @@
         </div>
     </div>
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const botonesTimer = document.querySelectorAll('.btn-temporizador');
+
+    botonesTimer.forEach(boton => {
+        boton.addEventListener('click', function() {
+            if (this.disabled) return;
+
+            let tiempoRestante = parseInt(this.getAttribute('data-tiempo'));
+            
+            this.disabled = true;
+            this.classList.remove('btn-outline-secondary');
+            this.classList.add('btn-warning', 'fw-bold', 'text-dark');
+
+            const intervalo = setInterval(() => {
+                let minutos = Math.floor(tiempoRestante / 60);
+                let segundos = tiempoRestante % 60;
+                
+                segundos = segundos < 10 ? '0' + segundos : segundos;
+
+                this.innerHTML = `⏳ ${minutos}:${segundos}`;
+
+                if (tiempoRestante <= 0) {
+                    clearInterval(intervalo);
+                    this.innerHTML = '✅ ¡A darle!';
+                    this.classList.remove('btn-warning');
+                    this.classList.add('btn-success', 'text-white');
+                }
+                
+                tiempoRestante--;
+            }, 1000);
+        });
+    });
+});
+</script>
 {% endblock %}
