@@ -7,6 +7,175 @@
   --light-text: #ffda9d;
   --shadow: 1px 2px 1px rgba(0, 0, 0, 0.175) !important;
 }
+body {
+  font-family: "Poppins", sans-serif;
+  background: #FFFF;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 80%, rgb(215, 200, 233) 100%);
+  color: #212529;
+  margin: 0;
+  padding: 0;
+}
+
+.poppins-thin {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.poppins-extralight {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.poppins-light {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-medium {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.poppins-extrabold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.poppins-black {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.poppins-thin-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.poppins-extralight-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: italic;
+}
+
+.poppins-light-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.poppins-regular-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.poppins-medium-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.poppins-semibold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.poppins-bold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.poppins-extrabold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: italic;
+}
+
+.poppins-black-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: italic;
+}
+
+.text-purple {
+    color: #310a75;
+}
+
+.text-oscuro {
+    color: rgb(37, 18, 63);
+}
+
+.text-grey {
+    color: #6a558e;
+}
+
+.text-kindawhite {
+    color: rgb(205, 180, 221);
+}
+
+.text-orange {
+    color: #ffb649;
+}
+
+
+.boton-morado {
+    background: var(--primary-color) !important;
+    color: white;
+    font-weight: bold;
+}
+
+.boton-morado:hover {
+    background-color: #ce86fe !important;
+}
+
+.boton-outline-morado {
+    background: transparent !important;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    font-weight: bold;
+}
+
+.boton-outline-morado:hover {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.boton-outline-morado:focus {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.boton-outline-morado:active {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
 
 .custom-nav-link {
     transition: all 0.2s ease-in-out;
@@ -60,7 +229,7 @@
 
 .navbar {
     background: #310A75 !important;
-    background: linear-gradient(0deg,rgba(29, 0, 80, 0.619) 0%, rgba(0, 0, 0, 1) 47%) !important;
+    background: linear-gradient(0deg,rgba(29, 0, 80, 0.769) 0%, rgba(0, 0, 0, 1) 47%) !important;
     backdrop-filter: blur(10px);
 
 }
@@ -69,12 +238,6 @@
     width: 38px;
     height: 38px;
     background-color: var(--primary-color) !important;
-}
-
-.navbar .btn {
-    background-color: var(--primary-color) !important;
-    color: white !important;
-    border: #ce86fe !important;
 }
 
 /*ejercicios*/
@@ -94,24 +257,24 @@
     box-shadow: 0 0.125rem 0.25rem var(--secondary-color);
 }
 
-.boton-agregar {
-    background: var(--primary-color) !important;
+.background-purple {
+    background-color: var(--primary-color);
     color: white;
-    font-weight: bold;
 }
 
-.boton-agregar:hover {
-    background-color: #ce86fe !important;
+.background-dark {
+    background-color: var(--dark);
+    color: white;
 }
 
-.texto-titulo {
-    color: #310a75 !important;
-    font-weight: bold !important;
-    font-size: xx-large !important;
+.background-orange {
+    background-color: var(--secondary-color);
+    color: white;
 }
 
-.agregar-tipoejercicio {
-    background-color: #850dfd !important;
+.background-light {
+    background-color: var(--light-text);
+    color: #212529;
 }
 
 .boton-verde {
@@ -124,10 +287,13 @@
 
 .boton-eliminar {
     background-color: var(--secondary-color);
+    color: white;
+    font-weight: bold !important;
 }
 
 .boton-eliminar:hover {
     background-color: #ffda9d;
+    color:#212529
 }
 
 .rutina-recomendada {
