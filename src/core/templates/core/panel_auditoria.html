@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="text-dark fw-bold mb-1">Panel de Auditoría</h2>
@@ -10,11 +10,11 @@
         <span class="badge bg-primary px-3 py-2 fs-6">Modo Administrador</span>
     </div>
 
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0 mb-5">
         <div class="card-body p-0">
-            <div class="table-responsive">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light text-secondary fw-semibold">
+                    <thead class="table-light text-secondary fw-semibold sticky-top">
                         <tr>
                             <th scope="col" class="ps-4 py-3" style="width: 18%;">Fecha y Hora</th>
                             <th scope="col" class="py-3" style="width: 15%;">Usuario</th>
@@ -63,6 +63,118 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- para division visual -->
+    <hr class="text-secondary opacity-25 mb-5">
+
+    <!-- para la gestión de terminos y condiciones por parte del administrador -->
+    <div class="mb-4">
+        <h3 class="text-dark fw-bold mb-1">Gestión Legal de la Plataforma</h3>
+        <p class="text-muted mb-0">Administración, redacción y versionado de los Términos y Condiciones</p>
+    </div>
+
+    <div class="row">
+        <!-- formulario para redactar nuevos TyC -->
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow-sm border-0 rounded-3 h-100">
+                <div class="card-header bg-dark text-white fw-bold py-3">
+                    <i class="bi bi-file-earmark-medical me-2"></i> Redactar Nueva Versión
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        <!-- el identificador para saber qué acción estamos haciendo en la vista -->
+                        <input type="hidden" name="crear_tyc" value="1">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary small text-uppercase">Título de la Versión</label>
+                            {{ form_tyc.titulo }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary small text-uppercase">Contenido Legal</label>
+                            {{ form_tyc.contenido }}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm mt-2">
+                            <i class="bi bi-cloud-arrow-up-fill me-2"></i> Publicar y Activar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- la tabla de Historial (Solo lectura) -->
+        <div class="col-lg-7 mb-4">
+            <div class="card shadow-sm border-0 rounded-3 h-100">
+                <div class="card-header bg-secondary text-white fw-bold py-3">
+                    <i class="bi bi-clock-history me-2"></i> Historial de Versiones
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 440px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light text-secondary small text-uppercase sticky-top">
+                                <tr>
+                                    <th class="ps-3 py-3">Fecha</th>
+                                    <th class="py-3">Título / Versión (Clic para leer)</th>
+                                    <th class="text-center pe-3 py-3">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tyc in historial_tyc %}
+                                    <tr {% if tyc.activo %}class="table-success"{% endif %}>
+                                        <td class="ps-3 text-muted small">
+                                            {{ tyc.fecha_actualizacion|date:"d/m/Y H:i" }}
+                                        </td>
+                                        <td>
+                                            <!-- para el título clickeable que abre el modal -->
+                                            <a href="#" class="fw-bold text-dark text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalTyC{{ tyc.id }}">
+                                                {{ tyc.titulo }} <i class="bi bi-box-arrow-up-right ms-1 text-primary small"></i>
+                                            </a>
+                                        </td>
+                                        <td class="text-center pe-3">
+                                            {% if tyc.activo %}
+                                                <span class="badge bg-success rounded-pill px-3 py-2 fw-bold shadow-sm">VIGENTE</span>
+                                            {% else %}
+                                                <span class="badge bg-light text-secondary border rounded-pill px-3 py-2">Archivado</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <!-- modal de previsualización -->
+                                    <div class="modal fade" id="modalTyC{{ tyc.id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-dark text-white">
+                                                    <h5 class="modal-title fw-bold">
+                                                        {{ tyc.titulo }} 
+                                                        {% if tyc.activo %}<span class="badge bg-success ms-2">VIGENTE</span>{% endif %}
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-4 text-start">
+                                                    <p class="text-muted small mb-4">Publicado el: {{ tyc.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+                                                    <div style="white-space: pre-wrap; font-family: inherit;">{{ tyc.contenido }}</div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar lectura</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="text-center py-5 text-muted">
+                                            <i class="bi bi-info-circle fs-4 d-block mb-2"></i>
+                                            No se han registrado versiones de Términos y Condiciones aún.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

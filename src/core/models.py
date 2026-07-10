@@ -21,15 +21,41 @@ class HistorialAcciones(models.Model):
         return f"{usuario_str} - {self.accion} ({self.fecha.strftime('%d/%m/%Y %H:%M')})"  
     
 class TerminosCondiciones(models.Model):
-    contenido = models.TextField(verbose_name="Texto Legal", help_text="Escribe aquí todos los términos y condiciones. Se respetarán los saltos de línea.")
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    #le agregamos un título para que el administrador los identifique facilmente
+    titulo = models.CharField(
+        max_length=150, 
+        verbose_name="Título de la Versión", 
+        help_text="Ej: TyC Actualización Ley de Protección 2026",
+        default="Términos y Condiciones Generales"  #default temporal por si ya hay resgistros viejos
+    )
+    contenido = models.TextField(
+        verbose_name="Texto Legal", 
+        help_text="Escribe aquí todos los términos y condiciones. Se respetarán los saltos de línea."
+    )
+    fecha_actualizacion = models.DateTimeField(
+        auto_now_add=True, 
+        verbose_name="Fecha de Publicación"
+    )
+    #campo clave para el versionado
+    activo = models.BooleanField(
+        default=False, 
+        verbose_name="¿Es la versión vigente?"
+    )
 
     class Meta:
         verbose_name = "Términos y Condiciones"
-        verbose_name_plural = "Términos y Condiciones"
+        verbose_name_plural = "Historial de Términos y Condiciones"
+        ordering = ['-fecha_actualizacion'] #ordenar para que el historial muestre lo mas nuevo arriba
+
+    def save(self, *args, **kwargs):
+        #logica de Auditoría: Si el admin activa esta versión, apagamos todas las demás automáticamente
+        if self.activo:
+            TerminosCondiciones.objects.filter(activo=True).update(activo=False)
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Términos actualizados el {self.fecha_actualizacion.strftime('%d/%m/%Y')}"
+        estado = "🟢 VIGENTE" if self.activo else "🔴 ARCHIVADO"
+        return f"{self.titulo} - {estado} ({self.fecha_actualizacion.strftime('%d/%m/%Y')})"
     
 class SesionEntrenamiento(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.RESTRICT)
