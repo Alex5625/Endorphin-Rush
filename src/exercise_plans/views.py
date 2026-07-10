@@ -159,6 +159,7 @@ def guardar_rutina(request, rutina_id):
 
 
 @login_required
+@require_POST
 def eliminar_rutina(request, pk):
     rutina = get_object_or_404(Rutina, pk=pk, autor=request.user)
 
@@ -203,6 +204,7 @@ def restaurar_rutina(request, pk):
     return redirect('exercise_plans:papelera_rutinas')
 
 @require_POST
+@login_required
 def eliminar_recordatorios_ajax(request, rutina_id):
     # print(f"🚀 ¡AJAX llegó a la vista! Intentando modificar rutina ID: {rutina_id}")
     # print(f"👤 Usuario actual: {request.user.username} (ID: {request.user.id})")
