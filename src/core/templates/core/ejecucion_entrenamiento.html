@@ -152,8 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (tiempoRestante <= 0) {
                     clearInterval(intervalo);
                     this.innerHTML = '✅ ¡A darle!';
-                    this.classList.remove('btn-warning');
-                    this.classList.add('btn-success', 'text-white');
+                    this.classList.remove('boton-eliminar');
+                    this.classList.add('boton-morado', 'text-white');
                 }
                 
                 tiempoRestante--;
