@@ -23,8 +23,13 @@ urlpatterns = [
     #para ejecución de entrenamiento
     path('ejecucion/<int:sesion_id>/', views.ejecutar_entrenamiento, name='ejecutar_entrenamiento'),
 
+    #para guardar el peso de un bloque de entrenamiento
     path('sesion/<int:sesion_id>/guardar-peso/<int:bloque_id>/', views.guardar_peso, name='guardar_peso'),
 
+    #para guardar el peso de un bloque de entrenamiento
     path('historial/', views.historial_entrenamiento, name='historial'),
+    
+    #para ver la notificación y marcarla como leída
+    path('notificacion/leer/<int:notificacion_id>/', views.leer_notificacion, name='leer_notificacion'),
 
  ] 
