@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
             <div class="card shadow-lg border-0 rounded-3">
-                <div class="card-header bg-primary text-white text-center py-3">
+                <div class="card-header background-purple text-white text-center py-3">
                     <h3 class="mb-0 fw-bold">
                         <i class="bi bi-pencil-square me-2"></i>Editar mi Perfil
                     </h3>
@@ -35,17 +35,17 @@
                                 
                                 <div class="row g-2 mt-4">
                                     <div class="col-12 col-xl-4">
-                                        <a href="{% url 'core:home' %}" class="btn btn-outline-secondary w-100 fw-bold">
+                                        <a href="{% url 'core:home' %}" class="btn boton-outline- w-100 fw-bold">
                                             Cancelar
                                         </a>
                                     </div>
                                     <div class="col-12 col-xl-4">
-                                        <button type="submit" class="btn btn-success w-100 fw-bold shadow-sm" title="Guardar Cambios">
+                                        <button type="submit" class="btn boton-morado w-100 fw-bold shadow-sm" title="Guardar Cambios">
                                             <i class="bi bi-floppy-fill"></i> Guardar
                                         </button>
                                     </div>
                                     <div class="col-12 col-xl-4">
-                                        <button type="button" class="btn btn-danger w-100 fw-bold shadow-sm" onclick="confirmarYEliminar()" title="Eliminar Cuenta">
+                                        <button type="button" class="btn boton-eliminar w-100 fw-bold shadow-sm" onclick="confirmarYEliminar()" title="Eliminar Cuenta">
                                             <i class="bi bi-trash-fill"></i> Eliminar
                                         </button>
                                     </div>
@@ -59,7 +59,7 @@
                         <div class="col-md-5 d-flex flex-column align-items-center justify-content-center border-start-md border-top border-md-top-0 pt-4 pt-md-0 mt-4 mt-md-0 ps-md-4">
                             
                             <div class="text-center">
-                                <i class="bi bi-person-badge text-primary mb-3 d-block" style="font-size: 4rem;"></i>
+                                <i class="bi bi-person-badge text-purple mb-3 d-block" style="font-size: 4rem;"></i>
                                 <h5 class="fw-bold text-secondary mb-3">Nivel de Acceso</h5>
                                 
                                 {% if user.is_superuser or user.is_staff %}

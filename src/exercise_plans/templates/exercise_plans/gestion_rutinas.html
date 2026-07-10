@@ -16,13 +16,13 @@
         {% if action == 'personal' %}
             <div class="col-md-6 col-lg-4 d-flex justify-content-end gap-2">
                 <div class="d-flex gap-2">
-                    <a href="{% url 'exercise_plans:papelera_rutinas' %}" class="btn btn-danger">
-                        <i class="bi bi-trash"></i> Ver Papelera
+                    <a href="{% url 'exercise_plans:papelera_rutinas' %}" class="btn boton-eliminar px-4 shadow-sm">
+                        <i class="bi bi-trash me-2"></i>Papelera
                     </a>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="{% url 'exercise_plans:crear_rutina' %}" class="btn boton-agregar px-4 shadow-sm">
-                        <i class="bi bi-plus-lg me-2"></i>Nueva Rutina
+                    <a href="{% url 'exercise_plans:crear_rutina' %}" class="btn boton-morado px-4 shadow-sm">
+                        <i class="bi bi-plus-lg me-2"></i>Nueva
                     </a>
                 </div>
             </div>
@@ -76,7 +76,7 @@
 
                                 {% if rutina.autor == request.user %}
                                     <div class="d-flex gap-2">
-                                        <a href="{% url 'exercise_plans:editar_rutina' rutina.id %}" class="btn boton-agregar px-4 shadow-sm text-white fw-medium">
+                                        <a href="{% url 'exercise_plans:editar_rutina' rutina.id %}" class="btn boton-verde px-4 shadow-sm fw-medium">
                                             <i class="bi bi-pencil-square me-2"></i>Editar
                                         </a>
                                         

@@ -8,7 +8,7 @@
 
 <div class="container py-5">
     <div class="mb-4 text-center">
-        <h1 class="fw-bold text-dark">
+        <h1 class="fw-bold text-oscuro">
             {% if user.is_authenticated %}
                 ¡A darlo todo, {{ user.first_name|default:user.username }}! 💪
             {% else %}
@@ -22,13 +22,13 @@
         <div class="row justify-content-center mb-5">
             <div class="col-md-8 col-lg-6">
                 {% if sesion_activa %}
-                    <div class="card bg-warning text-dark border-0 shadow-sm rounded-4 text-center">
+                    <div class="card background-orange border-0 shadow-sm rounded-4 text-center">
                         <div class="card-body py-4">
                             <h4 class="fw-bold mb-2"><i class="bi bi-stopwatch me-2"></i>¡Entrenamiento en curso!</h4>
                             <p class="mb-4">Estás realizando la rutina: <strong>{{ sesion_activa.rutina.nombre_rutina }}</strong></p>
                             <form action="{% url 'core:cambiar_estado_sesion' sesion_activa.rutina.id %}" method="POST">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-lg rounded-pill px-4 fw-bold shadow-sm">
+                                <button type="submit" class="btn boton-morado btn-lg rounded-pill px-4 fw-bold shadow-sm">
                                     ⏹️ Finalizar Rutina
                                 </button>
                             </form>
@@ -36,13 +36,13 @@
                     </div>
 
                 {% elif rutina_hoy %}
-                    <div class="card bg-success text-white border-0 shadow-sm rounded-4 text-center">
+                    <div class="card background-dark text-white border-0 shadow-sm rounded-4 text-center">
                         <div class="card-body py-4">
                             <h4 class="fw-bold mb-2"><i class="bi bi-lightning-charge me-2"></i>¡Tu misión de hoy!</h4>
                             <p class="mb-4">Te toca la rutina: <strong>{{ rutina_hoy.nombre_rutina }}</strong></p>
                             <form action="{% url 'core:cambiar_estado_sesion' rutina_hoy.id %}" method="POST">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-light text-success btn-lg rounded-pill px-4 fw-bold shadow-sm">
+                                <button type="submit" class="btn btn-light text-purple btn-lg rounded-pill px-4 fw-bold shadow-sm">
                                     ▶️ Iniciar Ahora
                                 </button>
                             </form>
@@ -62,8 +62,8 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-bold m-0"><i class="bi bi-calendar-range me-2"></i>Tu Semana</h4>
-            <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn btn-primary btn-sm fw-bold shadow-sm rounded-pill px-3">
-                Gestionar
+            <a href="{% url 'exercise_plans:mis_rutinas' %}" class="btn boton-morado btn-sm fw-bold shadow-sm rounded-pill px-3">
+                Gestionar Rutinas
             </a>
         </div>
 
@@ -75,18 +75,18 @@
                     <div class="tarjeta-dia flex-grow-1" style="flex-basis: 0;">
                         {% if rutina %}
                             <!-- Tarjeta de Día Ocupado -->
-                            <div class="card h-100 shadow-sm border-0 bg-primary text-white text-center rounded-4">
+                            <div class="card h-100 shadow-sm border-0 background-purple text-center rounded-4">
                                 <div class="card-header bg-transparent border-0 pt-3 pb-1">
                                     <span class="text-uppercase fw-bold small" style="letter-spacing: 1px;">{{ dia }}</span>
                                 </div>
                                 <div class="card-body d-flex flex-column justify-content-center py-2">
                                     <h6 class="fw-bold mb-2 text-truncate" title="{{ rutina.nombre_rutina }}">{{ rutina.nombre_rutina }}</h6>
                                     <div class="mb-3">
-                                        <span class="badge bg-white text-primary rounded-pill px-2 py-1 shadow-sm" style="font-size: 0.75rem;">
+                                        <span class="badge bg-white text-purple rounded-pill px-2 py-1 shadow-sm" style="font-size: 0.75rem;">
                                             {{ rutina.rutinaejercicio_set.count }} Ejercicios
                                         </span>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-light text-danger fw-bold rounded-pill shadow-sm w-100 transition-hover" 
+                                    <button type="button" class="btn btn-sm btn-light text-orange fw-bold rounded-pill shadow-sm w-100 transition-hover" 
                                             onclick="abrirModalEliminar('{{ rutina.id }}', '{{ rutina.nombre_rutina|escapejs }}')"
                                             title="Eliminar recordatorios">
                                         <i class="bi bi-bell-slash-fill me-1"></i> Quitar Alerta
@@ -157,7 +157,7 @@
         <div class="modal fade" id="modalRecordatorio" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg rounded-4">
-                    <div class="modal-header bg-warning text-dark rounded-top-4 py-3 border-0">
+                    <div class="modal-header background-purple rounded-top-4 py-3 border-0">
                         <h5 class="modal-title fw-bold">
                             <i class="bi bi-bell-fill me-2"></i> ¡Hora de Entrenar!
                         </h5>
@@ -166,7 +166,7 @@
                     <div class="modal-body p-4 text-center">
                         <h4 id="lbl-nombre-rutina" class="fw-bold text-primary mb-3">--</h4>
                         <p id="lbl-desc-rutina" class="text-muted mb-4">--</p>
-                        <button type="button" class="btn btn-warning w-100 fw-bold rounded-pill shadow-sm" data-bs-dismiss="modal">
+                        <button type="button" class="btn boton-eliminar w-100 fw-bold rounded-pill shadow-sm" data-bs-dismiss="modal">
                             ¡Vamos a darle! 💪
                         </button>
                     </div>
@@ -179,7 +179,7 @@
                 
                 {% for notificacion in notificaciones_pendientes %}
                     <div class="toast show shadow-lg border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="toast-header bg-primary text-white">
+                        <div class="toast-header background-purple text-white">
                             <i class="bi bi-bell-fill me-2 text-warning"></i>
                             <strong class="me-auto">Actualización de Rutina</strong>
                             <small class="text-white-50">¡Nueva!</small>
@@ -187,7 +187,7 @@
                         </div>
                         <div class="toast-body bg-light">
                             <p class="mb-2">{{ notificacion.mensaje }}</p>
-                            <a href="{% url 'core:leer_notificacion' notificacion.id %}" class="btn btn-sm btn-success w-100 fw-bold">                                
+                            <a href="{% url 'core:leer_notificacion' notificacion.id %}" class="btn btn-sm boton-verde w-100 fw-bold">                                
                                 <i class="bi bi-eye"></i> Ir a ver la rutina
                             </a>
                         </div>
