@@ -24,7 +24,18 @@
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ ejercicio.nombre_ejercicio|capfirst }}</h5>
-                        <h6 class="card-subtitle mb-2">{{ ejercicio.tipo_ejercicio.nombre_categoria|capfirst }}</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="card-subtitle mb-0 text-muted">{{ ejercicio.tipo_ejercicio.nombre_categoria|capfirst }}</h6>
+                            
+                            <small class="text-secondary">
+                                <i class="bi bi-person-circle"></i> 
+                                {% if ejercicio.autor %}
+                                    <strong>{{ ejercicio.autor.username }}</strong>
+                                {% else %}
+                                    <span class="text-danger">Sin autor</span>
+                                {% endif %}
+                            </small>
+                        </div>
                         
                         {% if ejercicio.autorizado %}
                             <span class="badge" id="aprobado">Aprobado</span>
@@ -34,16 +45,18 @@
 
                         <p class="card-text text-truncate">{{ ejercicio.descripcion_ejercicio }}</p>
                         
-                        <a href="{% url 'exercises:editar_ejercicio' ejercicio.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        
-                        <form method="POST" action="{% url 'exercises:eliminar_ejercicio' ejercicio.pk %}" class="d-inline" onsubmit="return confirm('¿Estás segura de que deseas eliminar el ejercicio «{{ ejercicio.nombre_ejercicio }}»?');">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
+                        {% if ejercicio.autor == request.user %}
+                            <a href="{% url 'exercises:editar_ejercicio' ejercicio.pk %}" class="btn btn-sm btn-outline-warning rounded-2 me-1" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            
+                            <form method="POST" action="{% url 'exercises:eliminar_ejercicio' ejercicio.pk %}" class="d-inline" onsubmit="return confirm('¿Estás segura de que deseas eliminar el ejercicio «{{ ejercicio.nombre_ejercicio }}»?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-2" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        {% endif %}
 
                         {% if user.is_staff and not ejercicio.autorizado %}
                             <small class="text-warning d-block mb-1 mt-3">Acciones de Admin:</small>

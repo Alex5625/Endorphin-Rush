@@ -24,9 +24,12 @@ def gestion_ejercicios(request):
     if request.method == 'POST':
         form = ejercicioForm(request.POST, request.FILES)
         if form.is_valid():
-            nuevo_ejercicio = form.save()
+            # CORRECCIÓN 1: Pausamos el guardado para inyectar al autor
+            nuevo_ejercicio = form.save(commit=False)
+            nuevo_ejercicio.autor = request.user 
+            nuevo_ejercicio.autorizado = False  # Aseguramos que inicie pendiente
+            nuevo_ejercicio.save()
 
-            #para guardar en el historial
             HistorialAcciones.objects.create(
                 usuario=request.user,
                 accion="Creación de Ejercicio (Pendiente)",
@@ -49,19 +52,20 @@ def gestion_ejercicios(request):
 @login_required
 @user_passes_test(es_coach_o_admin, login_url='core:home')
 def editar_ejercicio(request, pk):
-    
     ejercicio = get_object_or_404(Ejercicio, pk=pk, activo=True)
 
+    # CORRECCIÓN 2: Candado de seguridad para que nadie más entre por URL
+    if ejercicio.autor != request.user and not request.user.is_staff:
+        messages.error(request, "Acceso denegado: No puedes editar un ejercicio que no creaste.")
+        return redirect('exercises:lista_ejercicios')
+        
     if request.method == 'POST':
         form = ejercicioForm(request.POST, request.FILES, instance=ejercicio)
         if form.is_valid():
-
             ejercicio_modificado = form.save(commit=False)
-            #asi al ser editado por un entrenador, vuelve a requerir revision del admin
             ejercicio_modificado.autorizado = False 
             ejercicio_modificado.save()
 
-            #se guarda la edición en el historial
             HistorialAcciones.objects.create(
                 usuario=request.user,
                 accion="Modificación de Ejercicio (Pendiente)",
@@ -84,6 +88,10 @@ def eliminar_ejercicio(request, pk):
     ejercicio = get_object_or_404(Ejercicio, pk=pk, activo=True)
     nombre = ejercicio.nombre_ejercicio
 
+    if ejercicio.autor != request.user and not request.user.is_staff:
+        messages.error(request, "Acceso denegado: No puedes eliminar un ejercicio que no creaste.")
+        return redirect('exercises:lista_ejercicios')
+    
     #se deja registro en el historial antes de borrarlo
     HistorialAcciones.objects.create(
         usuario=request.user,
