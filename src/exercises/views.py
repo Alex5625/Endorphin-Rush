@@ -18,7 +18,7 @@ def es_coach_o_admin(user):
 @login_required
 @user_passes_test(es_coach_o_admin, login_url='core:home')
 def gestion_ejercicios(request):
-    lista_ejercicios = Ejercicio.objects.all()
+    lista_ejercicios = Ejercicio.objects.filter(activo=True).order_by('nombre_ejercicio')
 
     if request.method == 'POST':
         form = ejercicioForm(request.POST, request.FILES)
@@ -49,7 +49,7 @@ def gestion_ejercicios(request):
 @user_passes_test(es_coach_o_admin, login_url='core:home')
 def editar_ejercicio(request, pk):
     
-    ejercicio = get_object_or_404(Ejercicio, pk=pk)
+    ejercicio = get_object_or_404(Ejercicio, pk=pk, activo=True)
 
     if request.method == 'POST':
         form = ejercicioForm(request.POST, request.FILES, instance=ejercicio)
@@ -79,7 +79,7 @@ def editar_ejercicio(request, pk):
 @user_passes_test(es_coach_o_admin, login_url='core:home')
 def eliminar_ejercicio(request, pk):
     
-    ejercicio = get_object_or_404(Ejercicio, pk=pk)
+    ejercicio = get_object_or_404(Ejercicio, pk=pk, activo=True)
     nombre = ejercicio.nombre_ejercicio
 
     #se deja registro en el historial antes de borrarlo
@@ -98,7 +98,7 @@ def eliminar_ejercicio(request, pk):
 ## HU-12 Catálogo de Ejercicios con Filtros de grupos musculares y autor
 def catalogo_ejercicios(request):
     #base inicial: solo ejercicios aprobados
-    ejercicios = Ejercicio.objects.filter(autorizado=True)
+    ejercicios = Ejercicio.objects.filter(autorizado=True, activo=True).order_by('nombre_ejercicio')
     
     #se capturan filtros desde la URL
     grupo_seleccionado = request.GET.get('grupo')
@@ -114,8 +114,7 @@ def catalogo_ejercicios(request):
         
     # Consultas para armar los selectores de la interfaz
     grupos_musculares = TipoEjercicio.objects.all().order_by('nombre_categoria')
-    autores = User.objects.filter(ejercicios_creados__autorizado=True).distinct()
-    
+    autores = User.objects.filter(ejercicios_creados__autorizado=True, ejercicios_creados__activo=True).distinct()    
     context = {
         'ejercicios': ejercicios,
         'grupos_musculares': grupos_musculares,

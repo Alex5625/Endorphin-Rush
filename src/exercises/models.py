@@ -10,21 +10,21 @@ class Ejercicio(models.Model):
         verbose_name="Nombre del Ejercicio*"
     )
 
-    # 2. Añadimos el autor. null=True y blank=True evitan conflictos con datos viejos.
+    # CAMBIO: Usamos SET_NULL para que el ejercicio no se borre si el autor elimina su cuenta
     autor = models.ForeignKey(
         User, 
-        on_delete=models.CASCADE, 
+        on_delete=models.SET_NULL, 
         verbose_name="Autor/Entrenador",
         related_name="ejercicios_creados",
         null=True,   
         blank=True   
     )
 
-    # Relación cruzada apuntando a la app exercise_types de forma segura:
+    # CAMBIO: Usamos PROTECT para evitar que se borren ejercicios si se elimina un TipoEjercicio
     tipo_ejercicio = models.ForeignKey(
         'exercise_types.TipoEjercicio',
         verbose_name="Tipo de Ejercicio*",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
 
     imagen = models.ImageField(
@@ -44,5 +44,15 @@ class Ejercicio(models.Model):
         verbose_name="¿Autorizado para mostrar en la app?"
     )
 
+    # soft_delete
+    activo = models.BooleanField(
+        default=True,
+        verbose_name="¿Ejercicio Activo?"
+    )
+
     def __str__(self):
         return self.nombre_ejercicio
+
+    def delete(self, *args, **kwargs):
+        self.activo = False
+        self.save()

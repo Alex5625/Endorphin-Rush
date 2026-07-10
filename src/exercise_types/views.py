@@ -15,7 +15,7 @@ def es_coach_o_admin(user):
 @user_passes_test(es_coach_o_admin, login_url='core:home')
 def gestion_tipos_ejercicio(request):
 
-    categorias = TipoEjercicio.objects.all().order_by('nombre_categoria')
+    categorias = TipoEjercicio.objects.filter(activo=True).order_by('nombre_categoria')
 
     if request.method== 'POST':
         form = TipoEjercicioForm(request.POST)
@@ -38,7 +38,7 @@ def gestion_tipos_ejercicio(request):
 @user_passes_test(es_coach_o_admin, login_url='core:home')
 def editar_tipo_ejercicio(request, pk):
 
-    categoria = get_object_or_404(TipoEjercicio, pk=pk)
+    categoria = get_object_or_404(TipoEjercicio, pk=pk, activo=True)
 
     if request.method == 'POST':
         form = TipoEjercicioForm(request.POST, instance=categoria)
@@ -57,7 +57,7 @@ def editar_tipo_ejercicio(request, pk):
 @user_passes_test(es_coach_o_admin, login_url='core:home')
 def eliminar_tipo_ejercicio(request, pk):
 
-    categoria = get_object_or_404(TipoEjercicio, pk=pk)
+    categoria = get_object_or_404(TipoEjercicio, pk=pk, activo=True)
     nombre = categoria.nombre_categoria
     categoria.delete()
     messages.success(request, f"El grupo muscular '{nombre}' ha sido eliminado exitosamente.")
