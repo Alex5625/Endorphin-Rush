@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.urls import reverse
 from exercise_plans.models import Notificacion
+from django.contrib.auth.models import User
 
 # Create your views here.
 
@@ -23,12 +24,38 @@ def es_entrenador_o_admin(user):
 
 @login_required
 def forum_board(request):
+    #primero traemos todas las publicaciones
     publicaciones = Publicacion.objects.all()
     es_entrenador = es_entrenador_o_admin(request.user)
 
+    #despues capturamos los parámetros de filtrado desde la URL
+    autor_id = request.GET.get('autor')
+    ordenar_por = request.GET.get('ordenar')
+
+    # se aplica el Filtro por Autor
+    if autor_id:
+        publicaciones = publicaciones.filter(autor_id=autor_id)
+
+    #aplicar Ordenamiento
+    if ordenar_por == 'alfa_asc':
+        publicaciones = publicaciones.order_by('titulo')
+    elif ordenar_por == 'alfa_desc':
+        publicaciones = publicaciones.order_by('-titulo')
+    elif ordenar_por == 'antiguas':
+        publicaciones = publicaciones.order_by('fecha_creacion')
+    else:
+        # recientes o por defecto: La fecha más nueva arriba
+        publicaciones = publicaciones.order_by('-fecha_creacion')
+
+    #Obtener solo los usuarios que han hecho al menos una publicación
+    autores_foro = User.objects.filter(publicaciones__isnull=False).distinct()
+
     return render(request, 'forum/board.html', {
         'publicaciones': publicaciones,
-        'es_entrenador': es_entrenador
+        'es_entrenador': es_entrenador,
+        'autores_foro': autores_foro,
+        'autor_actual': autor_id,
+        'orden_actual': ordenar_por
     })
 @login_required
 @user_passes_test(es_entrenador_o_admin, login_url='forum:board')

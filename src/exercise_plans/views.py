@@ -12,6 +12,7 @@ from .forms import RutinaForm, RutinaEjercicioFormSet
 from .models import Rutina, Notificacion
 import json
 import time
+from exercises.models import Ejercicio
 
 @login_required
 def gestion_rutinas_view(request):
@@ -65,7 +66,8 @@ def crear_rutina(request):
     context = {
         'form': form,
         'formset': formset,
-        'action': 'crear'
+        'action': 'crear',
+        'todos_los_ejercicios': Ejercicio.objects.select_related('tipo_ejercicio').all()
     }
     return render(request, 'exercise_plans/configurar_rutina.html', context)
             
@@ -111,7 +113,8 @@ def editar_rutina(request, pk):
         'form': form,
         'formset': formset,
         'action': 'editar',
-        'rutina': rutina
+        'rutina': rutina,
+        'todos_los_ejercicios': Ejercicio.objects.select_related('tipo_ejercicio').all()
     }
     return render(request, 'exercise_plans/configurar_rutina.html', context)
 
