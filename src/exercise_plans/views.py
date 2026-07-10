@@ -63,11 +63,20 @@ def crear_rutina(request):
         if not es_coach and 'publico' in form.fields:
             del form.fields['publico']
             
+        #proteger el formset vacio
+        for form_ejercicio in formset:
+            if 'ejercicio' in form_ejercicio.fields:
+                form_ejercicio.fields['ejercicio'].queryset = Ejercicio.objects.filter(
+                    Q(autorizado=True) | Q(autor=request.user)
+                )
+            
     context = {
         'form': form,
         'formset': formset,
         'action': 'crear',
-        'todos_los_ejercicios': Ejercicio.objects.select_related('tipo_ejercicio').all()
+        'todos_los_ejercicios': Ejercicio.objects.select_related('tipo_ejercicio').filter(
+            Q(autorizado=True) | Q(autor=request.user))
+        
     }
     return render(request, 'exercise_plans/configurar_rutina.html', context)
             
@@ -114,7 +123,9 @@ def editar_rutina(request, pk):
         'formset': formset,
         'action': 'editar',
         'rutina': rutina,
-        'todos_los_ejercicios': Ejercicio.objects.select_related('tipo_ejercicio').all()
+        'todos_los_ejercicios': Ejercicio.objects.select_related('tipo_ejercicio').filter(
+            Q(autorizado=True) | Q(autor=request.user)
+        )
     }
     return render(request, 'exercise_plans/configurar_rutina.html', context)
 
